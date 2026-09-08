@@ -37,6 +37,16 @@ BUNDLE_INTERNAL='^(INPUTS|MANIFEST|OUTPUTS)\.tsv$|^run\.sh$|^(PROVENANCE|README)
 # not exist yet because the row has not run. Requiring them here turns a check for
 # vanished must-reads into a spell-checker for prose about future work.
 BUNDLE_RELATIVE='^(tables|figures|scripts|control|slurm|summaries|shards|examples)/'
+# This layer is not a project. Its documents necessarily describe the layout of a
+# CONSUMING project — `general/checks/...` is how a project addresses this layer,
+# `docs/BLOCKED.md` and `.claude/settings.json` are files a project has and the layer
+# does not. Inside the layer's own repository those references are correct and
+# unresolvable, and demanding them here would force the layer to carry a fake project
+# tree just to satisfy its own check. They are skipped ONLY in layer mode; in a project
+# every one of them resolves normally and a dead one still fails.
+PROJECT_RELATIVE='^(general|docs|results|launchers|retros|data|sidework|paper)/|^\.claude/'
+LAYER_MODE=0
+[ -f VERSION ] && [ -f agreements/WORKING_AGREEMENT.md ] && [ ! -d general ] && LAYER_MODE=1
 
 fail=0
 # --recurse-submodules is load-bearing once this layer is consumed as a submodule:
@@ -88,6 +98,7 @@ for src in ${SCAN:-$SCAN_DEFAULT} ${SCAN_OPTIONAL:-}; do
     printf '%s' "$ref" | grep -qE "$PLACEHOLDER" && continue
     basename "$ref" | grep -qE "$BUNDLE_INTERNAL" && continue   # bundle_valid.sh owns these
     printf '%s' "$ref" | grep -qE "$BUNDLE_RELATIVE" && continue # relative to results/<row>/
+    [ "$LAYER_MODE" = 1 ] && printf '%s' "$ref" | grep -qE "$PROJECT_RELATIVE" && continue
     # ARIS_OUTPUT/ is gitignored scratch by definition (CLAUDE.md). Requiring a
     # reference into it to be TRACKED is a contradiction the project can never satisfy:
     # BLOCKED.md records where a session put a working file, and must stay free to.
