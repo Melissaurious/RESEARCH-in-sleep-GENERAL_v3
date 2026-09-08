@@ -15,7 +15,7 @@ Every rule has an ID, a scope, and a check.
 
 **Budget: at most 25 ALWAYS rules.** They are paid on every turn of every session. Adding
 one requires deleting one or demoting it to WHEN. There is no cap on WHEN rules — they are
-paid only when their situation arises. *Currently 24 ALWAYS; one slot free.*
+paid only when their situation arises. *Currently **25 ALWAYS** — the budget is FULL. The next ALWAYS rule requires deleting one or demoting it to WHEN; that is the point of the cap, and 33 WHEN rules is not a problem.*
 
 ---
 
