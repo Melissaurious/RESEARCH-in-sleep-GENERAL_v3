@@ -1,0 +1,68 @@
+{
+  "cleanupPeriodDays": 45,
+  "permissions": {
+    "allow": [
+      "Read", "Glob", "Grep",
+      "Bash(ls:*)", "Bash(cat:*)", "Bash(head:*)", "Bash(tail:*)", "Bash(wc:*)",
+      "Bash(grep:*)", "Bash(rg:*)", "Bash(cut:*)", "Bash(column:*)", "Bash(awk:*)",
+      "Bash(sort:*)", "Bash(uniq:*)", "Bash(mkdir:*)", "Bash(mv:*)", "Bash(find:*)",
+      "Bash(sha256sum:*)", "Bash(md5sum:*)", "Bash(stat:*)", "Bash(dd:*)",
+      "Bash(df:*)", "Bash(du:*)", "Bash(free:*)", "Bash(nproc:*)", "Bash(nvidia-smi:*)",
+      "Bash(python:*)", "Bash(python3:*)", "Bash(conda list:*)", "Bash(conda env export:*)",
+      "Bash(git status:*)", "Bash(git diff:*)", "Bash(git log:*)", "Bash(git show:*)",
+      "Bash(git add:*)", "Bash(git commit:*)", "Bash(git checkout -b:*)", "Bash(git push:*)",
+      "Bash(squeue:*)", "Bash(sbatch:*)", "Bash(sacct:*)", "Bash(scancel:*)",
+      "Bash(sinfo:*)", "Bash(srun:*)", "Bash(seff:*)", "Bash(ssh:*)", "Bash(rsync:*)",
+      "Bash(bash agreements/checks/:*)", "Bash(bash agreements/agreements_sha.sh:*)",
+      "Bash(bash tools/:*)",
+      "Edit(__SCRATCH__/**)", "Write(__SCRATCH__/**)",
+      "Edit(results/**)", "Write(results/**)",
+      "Edit(retros/**)", "Write(retros/**)",
+      "Edit(docs/**)", "Write(docs/**)"
+    ],
+    "deny": [
+      "Bash(rm:*)",
+      "Bash(sudo:*)",
+      "Bash(chmod:*)",
+      "Bash(chattr:*)",
+      "Bash(git reset --hard:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(conda install:*)",
+      "Bash(pip install:*)",
+      "Bash(sed -i:*)",
+      "Read(~/.ssh/**)",
+      "Read(**/.env)",
+      "Read(**/credentials*)",
+      "Edit(/etc/**)",
+      "Edit(agreements/**)",
+      "Write(agreements/**)",
+      "Edit(results/*/MANIFEST.tsv)",
+      "Edit(results/*/INPUTS.tsv)",
+      "Edit(results/*/PROVENANCE.md)",
+      "Edit(results/*/env.lock)",
+      "Write(results/*/MANIFEST.tsv)",
+      "Write(results/*/INPUTS.tsv)",
+      "Write(results/*/PROVENANCE.md)",
+      "Write(results/*/env.lock)"
+    ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": true,
+    "filesystem": {
+      "allowWrite": ["__SCRATCH__", "results", "retros", "docs", ".agent-lock"]
+    },
+    "network": {
+      "allow": ["api.anthropic.com", "github.com", "api.github.com"]
+    }
+  },
+  "hooks": {
+    "SessionStart": [
+      { "hooks": [ { "type": "command", "command": "bash agreements/checks/no_concurrent_writer.sh" } ] }
+    ],
+    "SessionEnd": [
+      { "hooks": [ { "type": "command", "command": "bash agreements/checks/no_concurrent_writer.sh --release" } ] }
+    ]
+  }
+}
