@@ -44,7 +44,7 @@ BUNDLE_RELATIVE='^(tables|figures|scripts|control|slurm|summaries|shards|example
 # unresolvable, and demanding them here would force the layer to carry a fake project
 # tree just to satisfy its own check. They are skipped ONLY in layer mode; in a project
 # every one of them resolves normally and a dead one still fails.
-PROJECT_RELATIVE='^(general|docs|results|launchers|retros|data|sidework|paper)/|^\.claude/'
+PROJECT_RELATIVE='^(docs|results|launchers|retros|data|sidework|paper)/|^\.claude/'
 LAYER_MODE=0
 [ -f VERSION ] && [ -f agreements/WORKING_AGREEMENT.md ] && [ ! -d general ] && LAYER_MODE=1
 
@@ -80,7 +80,31 @@ resolve() {
   # Exact tracked path only. A basename fallback would let a reference to a file
   # that has MOVED keep resolving against its old name at a new location, which is
   # the drift this check exists to catch.
-  printf '%s\n' "$TRACKED" | grep -qxF "$1"
+  #
+  # $2, when given, is the submodule directory containing the referencing file. A
+  # layer's own documents are written relative to the layer's root — `checks/x.sh`,
+  # not `general/checks/x.sh` — because that is how they read inside the layer. From
+  # a consuming project the same reference needs the mount prefix. Resolving against
+  # both is what lets ONE document be correct in both places; without it a layer
+  # either fails its own check or fails every project's, and the usual fix for that
+  # is to weaken the check until it sees nothing.
+  printf '%s\n' "$TRACKED" | grep -qxF "$1" && return 0
+  [ -n "${2:-}" ] && printf '%s\n' "$TRACKED" | grep -qxF "$2/$1" && return 0
+  # The mirror case: inside the layer's own repo, a document that describes the loop as
+  # a PROJECT runs it writes `general/checks/x.sh`. Strip the mount prefix and resolve
+  # against the layer's own tree. Layer mode only, so a project still requires the real
+  # path to exist.
+  [ "${LAYER_MODE:-0}" = 1 ] && case "$1" in general/*)
+    printf '%s\n' "$TRACKED" | grep -qxF "${1#general/}" && return 0 ;; esac
+  return 1
+}
+
+# Which submodule, if any, contains a given file. Empty for a project's own documents.
+containing_submodule() {
+  local f="$1" m
+  for m in $SUBMODULES; do
+    case "$f" in "$m"/*) printf '%s' "$m"; return ;; esac
+  done
 }
 
 REQUIRED_SET=" ${SCAN:-$SCAN_DEFAULT} "
@@ -92,6 +116,7 @@ for src in ${SCAN:-$SCAN_DEFAULT} ${SCAN_OPTIONAL:-}; do
     case "$REQUIRED_SET" in *" $src "*) echo "MISSING: $src itself"; fail=1 ;; esac
     continue
   fi
+  SRC_SUB="$(containing_submodule "$src")"
   while IFS= read -r ref; do
     [ -z "$ref" ] && continue
     case "$ref" in /*|'~'*) continue ;; esac          # outside the repo
@@ -104,7 +129,7 @@ for src in ${SCAN:-$SCAN_DEFAULT} ${SCAN_OPTIONAL:-}; do
     # BLOCKED.md records where a session put a working file, and must stay free to.
     case "$ref" in ARIS_OUTPUT/*) continue ;; esac
     case "$ref" in */*) ;; *) continue ;; esac        # bare names in prose are examples
-    resolve "$ref" || { echo "MISSING: $src references $ref (not a tracked file)"; fail=1; }
+    resolve "$ref" "$SRC_SUB" || { echo "MISSING: $src references $ref (not a tracked file)"; fail=1; }
   done < <(extract_refs "$src")
 done
 
