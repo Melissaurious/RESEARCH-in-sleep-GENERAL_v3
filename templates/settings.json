@@ -13,7 +13,7 @@
       "Bash(git add:*)", "Bash(git commit:*)", "Bash(git checkout -b:*)", "Bash(git push:*)",
       "Bash(squeue:*)", "Bash(sbatch:*)", "Bash(sacct:*)", "Bash(scancel:*)",
       "Bash(sinfo:*)", "Bash(srun:*)", "Bash(seff:*)", "Bash(ssh:*)", "Bash(rsync:*)",
-      "Bash(bash agreements/checks/:*)", "Bash(bash agreements/agreements_sha.sh:*)",
+      "Bash(bash general/checks/:*)", "Bash(bash general/tools/general_sha.sh:*)",
       "Bash(bash tools/:*)",
       "Edit(__SCRATCH__/**)", "Write(__SCRATCH__/**)",
       "Edit(results/**)", "Write(results/**)",
@@ -35,8 +35,8 @@
       "Read(**/.env)",
       "Read(**/credentials*)",
       "Edit(/etc/**)",
-      "Edit(agreements/**)",
-      "Write(agreements/**)",
+      "Edit(general/**)",
+      "Write(general/**)",
       "Edit(results/*/MANIFEST.tsv)",
       "Edit(results/*/INPUTS.tsv)",
       "Edit(results/*/PROVENANCE.md)",
@@ -59,10 +59,10 @@
   },
   "hooks": {
     "SessionStart": [
-      { "hooks": [ { "type": "command", "command": "bash agreements/checks/no_concurrent_writer.sh" } ] }
+      { "hooks": [ { "type": "command", "command": "bash general/checks/no_concurrent_writer.sh" } ] }
     ],
     "SessionEnd": [
-      { "hooks": [ { "type": "command", "command": "bash agreements/checks/no_concurrent_writer.sh --release" } ] }
+      { "hooks": [ { "type": "command", "command": "bash general/checks/no_concurrent_writer.sh --release" } ] }
     ]
   }
 }
