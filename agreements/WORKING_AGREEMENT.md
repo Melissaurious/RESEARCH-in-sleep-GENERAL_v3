@@ -598,11 +598,26 @@ ambiguous about scientific interpretation: stop and wait.
 - validated: 2026-08-31 — used correctly on a conflict over a sealed register
 
 **WA-S.5** [WHEN writing a reply the operator will act on] Every operator-facing reply is
-also a file, written under `responses/` or the gate directory. A reply that exists only in a
-terminal cannot be quoted, diffed, or handed to another session intact.
+also a file, written to **`docs/responses/<date>_<gate>_r<NN>_<slug>.md`**. A reply that
+exists only in a terminal cannot be quoted, diffed, or handed to another session intact.
+
+`docs/` and not a top-level `responses/`, because `docs/` is in `allowWrite` and is tracked;
+and not the scratch directory, because scratch is gitignored and disposable, which defeats
+the purpose of writing the reply down at all (WA-S.2).
+
+**A reply carrying numbers states its standing in its own frontmatter** — the gate, the
+governance revision, what was sealed, and whether the numbers have landed. A recon reply is
+`[UNVERIFIED]` orientation under WA-I.3: no `INPUTS.tsv`, no `env.lock`, no `run.sh`. Without
+that line a reader finds counts in a governed, git-tracked file and reasonably assumes they
+landed.
 - check: `manual`
-- validated: 2026-09 — pasted terminal text arrived garbled at a parallel session and had to
-  be reconstructed
+- validated: 2026-09-09 — *would have caught:* this rule naming a top-level `responses/` that
+  is **not in `allowWrite`**, so following it literally meant either failing the write or
+  putting the reply in disposable scratch. A rule pointing at a path the settings forbid is
+  silent, which is what WA-P.3 is about.
+  *Would wrongly reject:* a reply that belongs inside its gate's scratch because it is working
+  notes rather than something handed onward — those stay in scratch and die with it. The rule
+  is about replies the operator or another session will ACT on.
 
 ---
 
