@@ -213,6 +213,29 @@ input to the *computation*.
 
 ## B — The bundle: how a number enters the repository
 
+**WA-B.0** [WHEN starting a gate] A gate does not start in a checkout whose governance submodule is not
+at the revision that checkout's branch records. BS-10 writes the revision into every bundle
+and BS-6 makes bundles write-once, so a gate run under a stale pin seals the wrong sha into
+an artifact that cannot be corrected.
+
+A worktree carries its **own** submodule object store, so several checkouts of one project
+can sit at several governance revisions at once — and the divergence is invisible until
+something reads the gitlink.
+
+A branch pinning a revision different from `main`'s is **not** an error: that is how a pin
+moves, by a deliberate commit with a decision record. It is reported, not failed.
+It is scoped WHEN rather than ALWAYS deliberately: a script fires it at gate start, so it
+does not need to be paid on every turn of every session. A rule a check enforces at the right
+moment does not also need to sit in context.
+- check: `checks/specs_exist.sh` — FAILS on a submodule off its recorded gitlink, WARNS on a
+  branch pin differing from main's
+- validated: 2026-09-09 — *would have caught:* three checkouts of one project running at
+  three governance revisions simultaneously, one of them a gate that stopped rather than
+  land a knowingly-stale pin. Watched rejecting a submodule moved off its gitlink and
+  accepting it restored, in the selftest and in three real checkouts.
+  *Would wrongly reject:* a branch that has deliberately moved the pin ahead of main, which
+  is the normal way a layer revision is adopted — hence WARN, not FAIL, for that half.
+
 **WA-B.1** [ALWAYS] A number enters the repository only inside `results/<GATE>/`, with its
 script verbatim, its inputs hashed, its environment locked by content, its seed declared, its
 command recorded, and the revision of this layer it ran under. Full spec:

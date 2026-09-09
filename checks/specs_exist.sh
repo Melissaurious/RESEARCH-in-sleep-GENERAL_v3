@@ -145,9 +145,49 @@ for f in agreements/*.md site/*.md general/agreements/*.md general/site/*.md; do
     || { echo "UNDOCUMENTED: $f is not listed in README.md"; fail=1; }
 done
 
-[ "$fail" = 0 ] && echo "OK: every referenced repo path is a tracked file; every spec is documented"
+# --- the governance pin ------------------------------------------------------------
+#
+# A worktree carries its OWN submodule object store, so three checkouts of one project
+# can sit at three different governance revisions at once - and did. BS-10 writes the
+# revision into every bundle and BS-6 makes bundles write-once, so a gate that runs
+# under a stale pin cannot be repaired afterwards: the wrong sha is sealed into the
+# artifact. The check therefore runs BEFORE a gate starts, which is here.
+#
+# FAILS on the one that is unambiguous: the submodule is not at the revision THIS
+# branch records. That is a stale or dirty checkout, never a deliberate act.
+#
+# WARNS on a branch pinning a different revision from main. That IS how a pin moves -
+# a deliberate commit with a decision record - so it may not fail. Silence would be
+# wrong too: an accidental move looks identical until someone reads the diff.
+for sm in $SUBMODULES; do
+  [ -d "$sm/.git" ] || [ -f "$sm/.git" ] || continue
+  recorded="$(git rev-parse "HEAD:$sm" 2>/dev/null || true)"
+  actual="$(git -C "$sm" rev-parse HEAD 2>/dev/null || true)"
+  [ -n "$recorded" ] && [ -n "$actual" ] || continue
+
+  if [ "$recorded" != "$actual" ]; then
+    echo "PIN: $sm is at ${actual:0:7} but this branch records ${recorded:0:7}"
+    echo "     A gate started here would seal the wrong revision into PROVENANCE.md (BS-10),"
+    echo "     and BS-6 makes that unfixable. Resolve before starting a gate:"
+    echo "       git submodule update --init --recursive"
+    echo "     or, if the revision is not in this worktree's store, fetch it from another:"
+    echo "       git -C $sm fetch <other-checkout>/.git/modules/$sm $recorded && git -C $sm checkout $recorded"
+    fail=1
+  fi
+
+  main_pin="$(git rev-parse "main:$sm" 2>/dev/null || true)"
+  if [ -n "$main_pin" ] && [ "$main_pin" != "$recorded" ]; then
+    echo "PIN NOTE: $sm here is ${recorded:0:7}; main records ${main_pin:0:7}."
+    echo "          Deliberate moves are fine and need a decision record. An accidental one"
+    echo "          looks identical until someone reads the diff, so it is said out loud."
+  fi
+done
+
+[ "$fail" = 0 ] && echo "OK: every referenced repo path is a tracked file; every spec is documented; the governance pin matches this branch"
 
 # --------------------------------------------------------------------------
+
+
 if [ "${SELFTEST:-0}" = "1" ]; then
   export SELFTEST=0                     # never let a child re-enter this block
   ME="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
@@ -213,6 +253,32 @@ if [ "${SELFTEST:-0}" = "1" ]; then
     printf '  ok    %-48s %s\n' "submodule specs need no README entry" "pass"; ok=$((ok+1))
   else
     printf '  FAIL  %-48s %s\n' "submodule specs need no README entry" "wanted pass"; bad=$((bad+1))
+  fi
+
+  # --- the pin, both directions -----------------------------------------------------
+  # The super-project above is clean and its pin matches, which the two cases before this
+  # already exercised. Now move the submodule OFF the recorded gitlink and require a
+  # reject: that is the stale-checkout condition a worktree lands in, and the one that
+  # would seal a wrong revision into a write-once bundle.
+  printf '# A2\n' > "$S/A2.md"
+  git -C "$S" add -A && git -C "$S" -c user.email=t@t -c user.name=t commit -qm second >/dev/null 2>&1
+  git -C "$P/agreements" fetch -q "$S" 2>/dev/null
+  git -C "$P/agreements" checkout -q FETCH_HEAD 2>/dev/null
+  printf '# r\n\n| `agreements/A.md` | rules |\n' > "$P/README.md"
+  if ( cd "$P" && bash "$ME" ) >/dev/null 2>&1; then
+    printf '  FAIL  %-48s %s\n' "submodule moved OFF the recorded pin" "wanted reject"; bad=$((bad+1))
+  else
+    printf '  ok    %-48s %s\n' "submodule moved OFF the recorded pin" "reject"; ok=$((ok+1))
+  fi
+
+  # Put it back on the pin and require an accept, so the reject above is about the pin
+  # and not about anything the move happened to disturb.
+  RECORDED="$(git -C "$P" rev-parse HEAD:agreements 2>/dev/null)"
+  git -C "$P/agreements" checkout -q "$RECORDED" 2>/dev/null
+  if ( cd "$P" && bash "$ME" ) >/dev/null 2>&1; then
+    printf '  ok    %-48s %s\n' "submodule restored TO the recorded pin" "pass"; ok=$((ok+1))
+  else
+    printf '  FAIL  %-48s %s\n' "submodule restored TO the recorded pin" "wanted pass"; bad=$((bad+1))
   fi
 
   echo "--- $ok passed, $bad failed ---"
