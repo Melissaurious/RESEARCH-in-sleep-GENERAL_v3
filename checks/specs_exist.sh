@@ -123,6 +123,11 @@ for src in ${SCAN:-$SCAN_DEFAULT} ${SCAN_OPTIONAL:-}; do
     printf '%s' "$ref" | grep -qE "$PLACEHOLDER" && continue
     basename "$ref" | grep -qE "$BUNDLE_INTERNAL" && continue   # bundle_valid.sh owns these
     printf '%s' "$ref" | grep -qE "$BUNDLE_RELATIVE" && continue # relative to results/<row>/
+    # A path inside .git/ is never a tracked file - git does not version its own
+    # internals. Documents legitimately NAME them (a lock file, a config key) when
+    # explaining a git behaviour, and requiring those to resolve turns this check into
+    # a false alarm on correct prose.
+    case "$ref" in .git/*|*/.git/*) continue ;; esac
     [ "$LAYER_MODE" = 1 ] && printf '%s' "$ref" | grep -qE "$PROJECT_RELATIVE" && continue
     # ARIS_OUTPUT/ is gitignored scratch by definition (CLAUDE.md). Requiring a
     # reference into it to be TRACKED is a contradiction the project can never satisfy:
