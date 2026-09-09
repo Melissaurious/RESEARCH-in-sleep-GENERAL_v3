@@ -28,10 +28,13 @@ TMP="$(mktemp)"
   if ls launchers/*.md >/dev/null 2>&1; then
     printf '| track | launcher | gates declared | claims declared |\n|---|---|---|---|\n'
     for L in launchers/*.md; do
+      case "$L" in *TEMPLATE*) continue ;; esac   # a blank scaffold is not a track
       t="$(basename "$L" .md | sed 's/^LAUNCHER_//')"
       # A gate row names a stop condition; a claim row carries an UNPROVEN/SUPPORTED/etc.
-      ng=$(grep -cE '^\|.*\|.*(SINGLE-PASS|LOOPED).*\|' "$L" 2>/dev/null || echo 0)
-      nc=$(grep -cE '^\|[[:space:]]*`?([a-z0-9][a-z0-9_-]*:)?C[0-9]+' "$L" 2>/dev/null || echo 0)
+      # grep -c exits 1 on zero matches, so `|| echo 0` appends a SECOND zero and the
+      # cell renders as "0\n0". Swallow the status instead of substituting a value.
+      ng=$(grep -cE '^\|.*\|.*(SINGLE-PASS|LOOPED).*\|' "$L" 2>/dev/null); ng=${ng:-0}
+      nc=$(grep -cE '^\|[[:space:]]*`?([a-z0-9][a-z0-9_-]*:)?C[0-9]+' "$L" 2>/dev/null); nc=${nc:-0}
       printf '| %s | `%s` | %s | %s |\n' "$t" "$L" "$ng" "$nc"
     done
   else
@@ -42,6 +45,7 @@ TMP="$(mktemp)"
   if ls launchers/*.md >/dev/null 2>&1; then
     printf '| ID | status | track |\n|---|---|---|\n'
     for L in launchers/*.md; do
+      case "$L" in *TEMPLATE*) continue ;; esac   # a blank scaffold is not a track
       t="$(basename "$L" .md | sed 's/^LAUNCHER_//')"
       grep -E '^\|[[:space:]]*`?([a-z0-9][a-z0-9_-]*:)?C[0-9]+' "$L" 2>/dev/null \
         | while IFS= read -r line; do
@@ -68,7 +72,7 @@ TMP="$(mktemp)"
   fi
 
   printf '\n## Progress\n\n'
-  NU=$(grep -hcE 'UNPROVEN' launchers/*.md 2>/dev/null | paste -sd+ | bc 2>/dev/null || echo 0)
+  NU=$(grep -hoE 'UNPROVEN' launchers/*.md 2>/dev/null | wc -l); NU=${NU:-0}
   NB=$(ls -1d results/*/ 2>/dev/null | wc -l)
   printf -- '- claims still UNPROVEN: **%s**\n' "${NU:-0}"
   printf -- '- bundles landed: **%s**\n' "$NB"
