@@ -143,9 +143,27 @@ validate() {
   # new claim describes it in PROSE; the operator assigns the number. So: every claim id
   # the README proposes a status for must already be a row in CLAIMS.md.
   #
-  # The ledger is found at CLAIMS_MD, else two levels up from results/<ROW>/, else the
-  # git root. A project with no ledger is not in scope and the rule stays silent.
+  # The ledger lives in the TRACK'S LAUNCHER, section 3b — claims are declared there and
+  # nowhere else, so the operator writes one document per track (WA-L.1). Search order:
+  # CLAIMS_MD, then every launcher in the project, then a standalone CLAIMS.md for a
+  # project that still keeps one.
+  #
+  # Reading EVERY launcher rather than "the" launcher is deliberate: a bundle does not
+  # record which track it belongs to, and inferring it from the gate id would make the
+  # check fail open on any naming the guess did not anticipate. A grep over all of them
+  # costs nothing and cannot miss a declared claim.
   ledger="${CLAIMS_MD:-}"
+  LEDGER_TMP=""
+  LEDGER_NAME=""
+  if [ -z "$ledger" ]; then
+    ROOT="$(git -C "$B" rev-parse --show-toplevel 2>/dev/null)"
+    if [ -n "$ROOT" ] && ls "$ROOT"/launchers/*.md >/dev/null 2>&1; then
+      LEDGER_TMP="$(mktemp)"
+      cat "$ROOT"/launchers/*.md > "$LEDGER_TMP"
+      ledger="$LEDGER_TMP"
+      LEDGER_NAME="the claims tables in $ROOT/launchers/"
+    fi
+  fi
   if [ -z "$ledger" ]; then
     for k in "$B/../../CLAIMS.md" "$(git -C "$B" rev-parse --show-toplevel 2>/dev/null)/CLAIMS.md"; do
       [ -f "$k" ] && { ledger="$k"; break; }
@@ -154,13 +172,14 @@ validate() {
   if [ -n "$ledger" ] && [ -f "$ledger" ] && [ -s "$B/README.md" ]; then
     while IFS= read -r cid; do
       [ -z "$cid" ] && continue
-      grep -qE "^\|[[:space:]]*(~~)?${cid}(~~)?[[:space:]]*\|" "$ledger" \
-        || { echo "BS-12: README proposes a status for $cid, which is not a claim in $ledger."
-             echo "       A row may PROPOSE a new claim in prose; it may not assign the id (CL-1, CL-2)."
+      grep -qE "^\|[[:space:]]*\`?(~~)?${cid}(~~)?\`?[[:space:]]*\|" "$ledger" \
+        || { echo "BS-12: README proposes a status for $cid, which is not a declared claim in ${LEDGER_NAME:-$ledger}."
+             echo "       A gate may PROPOSE a new claim in prose; it may not assign the id (CL-1, CL-2)."
              fail=1; }
-    done < <(grep -oE '^\|[[:space:]]*(~~)?C[0-9]+[^|[:space:]]*' "$B/README.md" \
-             | grep -oE 'C[0-9]+[^|[:space:]]*' | sed 's/~~$//' | sort -u)
+    done < <(grep -oE '^\|[[:space:]]*`?(~~)?([a-z0-9][a-z0-9_-]*:)?C[0-9]+[^|`[:space:]]*' "$B/README.md" \
+             | grep -oE '([a-z0-9][a-z0-9_-]*:)?C[0-9]+[^|`[:space:]]*' | sed 's/~~$//' | sort -u)
   fi
+  [ -n "${LEDGER_TMP:-}" ] && { rm -f "$LEDGER_TMP" 2>/dev/null; LEDGER_TMP=""; }
 
   # BS-13 — a figure names the script that drew it, and ships what it plots.
   #

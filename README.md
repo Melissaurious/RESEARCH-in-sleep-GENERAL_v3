@@ -27,7 +27,10 @@ not read unless a launcher explicitly says to.
 | `site/IBEX.md` | running and submitting on the cluster. |
 | `site/TOOLING.md` | models, reviewer config, environment policy. |
 | `checks/` | the runnable half of the rules. Every one carries a `SELFTEST=1` target. |
-| `templates/` | copy-and-fill scaffolds for a new project, launcher, ledger and roadmap. |
+| `templates/LAUNCHER.md` | the scaffold for the ONE document an operator writes per track. |
+| `templates/` | the rest: project CLAUDE.md, gate workflow, settings, gitignore. |
+| `tools/bundle.sh` | assembles a bundle — hashes inputs, locks the environment, copies scripts verbatim. The fixed cost of provenance, scripted. |
+| `tools/index.sh` | GENERATES `INDEX.md`, the cross-track rollup of claims and bundles. Never hand-edited. |
 | `tools/` | `adversary.sh`, `general_sha.sh`, `new_project.sh`, `status.sh`, `worktree.sh`, `sidework.sh`, and the python helpers. |
 
 ## Checks
@@ -60,9 +63,10 @@ It creates the tree, adds this layer as a submodule at `general/`, copies the te
 installs `.claude/settings.json` with the deny list and sandbox boundary, and runs
 `specs_exist.sh` to prove the checkout is governed.
 
-Then fill in, in this order: `CLAUDE.md` (subject, environment, paths), `GOALS.md` (what you
-want to be able to claim), `CLAIMS.md` (the falsifiable statements), and a launcher for the
-first track. A gate does not start before its claim exists as UNPROVEN.
+Then fill in two things and only two: `CLAUDE.md` (subject, environment, paths) and
+`launchers/LAUNCHER_<track>.md` (objective, kill criteria, non-goals, inputs with trust
+grades, claims, gates). A gate does not start before its claim is declared UNPROVEN in the
+launcher.
 
 ## Amending this layer
 

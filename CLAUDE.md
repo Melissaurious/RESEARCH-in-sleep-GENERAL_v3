@@ -26,12 +26,15 @@ When the situation applies:
 
 ## The shape of work
 
-    GOALS.md          G1..Gn    what you want to be able to claim. Rare changes.
-    CLAIMS.md         C1..Cn    falsifiable statements, each serving a goal.
-    launchers/        one per TRACK — the authority on scope (WA-L.1)
-    ROADMAP.md        one GATE per row, each settling one or more claims
-    results/<GATE>/             the evidence. A bundle, or it did not happen.
-    paper/                      assembled from SUPPORTED claims only (BS-7)
+    launchers/<track>.md  the ONLY document the operator writes (WA-L.1):
+                          §1 objective, success criterion, KILL CRITERIA
+                          §2 out of scope and NON-GOALS
+                          §3 inputs, each with a trust grade
+                          §3b CLAIMS this track settles, born UNPROVEN
+                          §4 GATES — measurement, weight, mode, stop condition
+    results/<GATE>/       the evidence. A bundle, or it did not happen.
+    INDEX.md              GENERATED rollup (tools/index.sh). Never hand-edited.
+    paper/                assembled from SUPPORTED claims only (BS-7)
 
 A **track** is the unit of scope; a **gate** is the unit of a number. One gate = one
 measurement = one session = one bundle = one branch (WA-R.1).
@@ -46,7 +49,8 @@ a week with ten documents and no claim movement is not a week of work.
    refuses the write; the instruction alone would drift. On approval the first action out of
    plan mode is `ARIS_OUTPUT/<gate>/PLAN.md`.
 1. One gate is active. It names one measurement and its stop condition (WA-R.1, WA-R.2), and
-   the claim it settles exists in `CLAIMS.md` as UNPROVEN **before** it runs.
+   the claim it settles is declared UNPROVEN in its launcher §3b **before** it runs (CL-1).
+   Its **weight** is declared too — LIGHT or FULL (WA-B.5).
 2. Work happens in `ARIS_OUTPUT/<gate>/`. Scratch is free.
 3. The gate is done when `results/<GATE>/` exists and `run.sh` reruns and reproduces the
    number (WA-B.2). Not when a document is written.

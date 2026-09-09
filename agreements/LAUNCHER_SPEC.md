@@ -1,11 +1,17 @@
 # LAUNCHER SPEC
 
 A **launcher** is the authority on scope for a track. It is written before the track starts
-and it is what a session reads to know what it may do. `ROADMAP.md` says what the gates are;
-the launcher says what the track *is*, and constrains every session in it.
+and it is what a session reads to know what it may do. It says what the track *is* — its
+boundary, its inputs, its claims and its gates — and constrains every session in it.
 
 One launcher per track, at `launchers/LAUNCHER_<track>.md`. A track without one does not
 start (WA-L.1).
+
+**It is the only document the operator writes.** Objective, kill criteria, non-goals, inputs,
+claims and gates all live in it. There is no separate goals file, claim ledger or roadmap —
+those were three hand-maintained files doing this file's job, and a claim that lives in two
+places has two versions inside a week (WA-P.4). A cross-track rollup is GENERATED on demand
+by `tools/index.sh` and is never hand-edited.
 
 A launcher exists because an instruction a session can drift past is not a boundary. Each
 section below became mandatory after its absence produced a defect, and the six are the
@@ -63,11 +69,45 @@ An ungraded input is DO-NOT-USE. A FROZEN row with no bundle id is not FROZEN �
 RE-DERIVE, or it carries the `operator-supplied design fact` tag with a person and a date
 (WA-I.5).
 
+### 4b · Claims this track settles
+
+The ledger, scoped to the track. **A claim is declared UNPROVEN here before the gate that
+settles it runs** (CL-1). Ids carry the track name — `<track>:C1` — so two launchers cannot
+collide, which a flat project-wide numbering did twice.
+
+This table is the operator's (CL-2). A session proposes a paste-ready block in its bundle
+README and never edits the launcher. `bundle_valid.sh` enforces it: BS-12 reads every
+launcher's claims table and rejects a README proposing a status for an id nobody declared.
+
+Claim rules, in force wherever claims are written:
+
+    CL-1  the claim exists as UNPROVEN before the gate that settles it runs
+    CL-2  the ledger is the operator's; a session proposes, never edits
+    CL-3  a refutation is a result and lands like any other
+    CL-4  a claim carries its unit, denominator, scope and circularity grade at birth
+    CL-5  SUPPORTED requires an audit verdict AND the operator's sign-off in their own words
+    CL-6  a claim is never rescued by qualification; a split settles as the weaker half
+
 ### 5 · Gates
 
-One row per gate: its id, its measurement, its **mode** (SINGLE-PASS or LOOPED), its stop
-condition, and what it is gated on. A LOOPED gate's stop condition contains a number and a
-round budget (WA-L.2).
+One row per gate: its id, its measurement, its **weight** (LIGHT or FULL), its **mode**
+(SINGLE-PASS or LOOPED), its stop condition, the claim it settles, and what it is gated on.
+A LOOPED gate's stop condition contains a number and a round budget (WA-L.2).
+
+**Weight** (WA-B.5) decides how much control machinery the gate pays for:
+
+| | LIGHT | FULL |
+|---|---|---|
+| inputs hashed, env locked, scripts verbatim, `run.sh` reruns | required | required |
+| thresholds declared before scoring | — | required |
+| positive control per zero | — | required |
+| denominator's independent second count | — | required |
+| hand-checked fixture | — | required |
+| may enter a claim, a figure, or the paper | **no** | yes |
+
+LIGHT is for recon, feasibility, "how many are there", "does this tool run on real data".
+Reproducibility is not negotiable at either weight; only the control burden moves. Promoting
+a LIGHT number means re-landing it as a FULL bundle, never editing the LIGHT one (WA-B.3).
 
 Where gates are independent, say so and draw the dependency graph. Independent gates are the
 whole reason a track exists rather than a queue — they can run in parallel sessions, on

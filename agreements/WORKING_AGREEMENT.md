@@ -23,8 +23,15 @@ paid only when their situation arises. *Currently **25 ALWAYS** — the budget i
 
 **WA-L.1** [ALWAYS] Every track has a launcher, written before the track starts. The
 launcher is the authority on scope for every session in that track: its write boundary, its
-inputs and their trust grades, its gates, its out-of-scope list, and its stop conditions.
+inputs and their trust grades, its **claims**, its gates, its out-of-scope list and non-goals,
+its kill criteria, and its stop conditions.
 A session's own reading of what the work "obviously" needs does not override it.
+
+**It is the only document the operator writes.** Goals, claims and gates live in it; there is
+no separate goals file, claim ledger or roadmap. A cross-track view is GENERATED from the
+launchers and the landed bundles (`tools/index.sh`) and is never hand-edited — a rollup a
+person maintains is a second place for a claim to live, and they disagree within a week
+(WA-P.4).
 Full spec: `agreements/LAUNCHER_SPEC.md`.
 - check: `manual` — the track's launcher exists and names all six required sections
 - validated: 2026-08 — an unlaunched stage line accumulated 43 output directories, 37 with a
@@ -233,6 +240,29 @@ new bundle with a new id naming its predecessor. Never edit a landed bundle.
   claim ledger, where the audit trail IS the file; this rule governs bundles, where the audit
   trail is a new bundle naming its predecessor.
 
+**WA-B.5** [WHEN declaring a gate's weight] A gate is **LIGHT** or **FULL**, declared in
+the launcher before it runs.
+
+*LIGHT* — the provenance skeleton only: inputs hashed, environment locked by content,
+scripts verbatim, `run.sh` reruns and reproduces. No bespoke control fixture, no seeded
+positive control, no independent second count. **A LIGHT number may not enter a claim, a
+figure, or the paper.** Promoting one means a new FULL bundle, never an edit (WA-B.3).
+
+*FULL* — everything: thresholds declared before scoring, a positive control for every zero,
+the denominator's independent second count (WA-D.7), the hand-checked fixture. Required the
+moment a number becomes a claim, a figure, or paper text.
+
+The controls exist to protect claims, so they are paid where a claim rests on the number.
+Reproducibility is not negotiable at either weight; only the control burden moves.
+- check: `manual` — the launcher's gate table has a weight in every row, and no LIGHT
+  bundle is cited by a claim
+- validated: 2026-09-09 — *would have caught:* a project that applied census-grade control
+  machinery to recon questions and spent days per measurement, which the operator
+  experienced as the method being slow rather than as a weight being mis-set.
+  *Would wrongly reject:* a LIGHT gate whose result turns out to matter — a feasibility
+  count that becomes the paper's denominator. The rule does not forbid that; it forbids
+  citing it without re-landing it as FULL, which is one rerun, not a re-investigation.
+
 **WA-B.4** [WHEN writing a bundle README] Counts are reported so defects are visible:
 n attempted, n succeeded, n dropped and why. Never footnote a failure. A non-zero "missing
 provenance" or "scripts ABSENT" count is fixed before publishing, never explained away.
@@ -246,6 +276,13 @@ provenance" or "scripts ABSENT" count is fixed before publishing, never explaine
 **WA-C.1** [ALWAYS] One agent process writes to one checkout at a time. A second reader may
 think, review, and pair on design at any time; it may not hold open file handles on a tree
 another agent is writing.
+
+**One checkout is the normal case.** Sequential gates share one working directory, each in
+its own `ARIS_OUTPUT/<gate>/`; sessions that only read, analyse or explore share it too. A
+second checkout (`tools/worktree.sh`) is needed ONLY when two gates compute at the same time
+and both will COMMIT — that is the single thing one directory cannot do, because they collide
+on the git index and on the lock. Remove a worktree when its gate lands; a tree that outlives
+its gate is a stale checkout carrying stale governance.
 - check: `checks/no_concurrent_writer.sh` (SessionStart hook)
 - validated: 2026-08-31 — files appeared mid-run during a stage and were recorded as blocked
 

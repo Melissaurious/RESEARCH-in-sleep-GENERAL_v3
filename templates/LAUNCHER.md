@@ -1,7 +1,13 @@
 # LAUNCHER — <track name>
 
-_Copy to `launchers/LAUNCHER_<track>.md` and fill. Do not drop a section: a launcher that
-has dropped one has dropped the defect that section prevents (`general/agreements/LAUNCHER_SPEC.md`)._
+_Copy to `launchers/LAUNCHER_<track>.md` and fill._
+
+**This is the only document the operator writes.** Goals, non-goals, kill criteria, claims
+and gates all live here. There is no separate `GOALS.md`, `CLAIMS.md` or `ROADMAP.md` — one
+track, one file, written once and frozen when the first gate starts.
+
+Do not drop a section: a launcher that has dropped one has dropped the defect that section
+prevents (`general/agreements/LAUNCHER_SPEC.md`).
 
 **Mission, in one sentence.** <what this track produces, and why it runs now>
 
@@ -62,17 +68,15 @@ If the two disagree, **the settings win** and the launcher is the defect.
    seeing the outcome is not a parameter, it is the result.
 3. **Grade circularity before use** (§3). The instrument that DEFINES a property may not be
    the instrument that MEASURES it.
-4. **Trace every number to the code that wrote it.** No producing script → `[UNVERIFIED]`,
-   and nothing is built on it.
-5. **Census or estimate, and say which** (WA-D.2). Exact passes; stream if too large.
+4. **Trace every number to the code that wrote it.** No producing script → `[UNVERIFIED]`.
+5. **Census or estimate, and say which** (WA-D.2).
 6. **Probe field semantics before building on a field** (WA-D.3). When the values disagree
    with the documented schema, the values win.
 7. **State the unit** of every count and rate.
 
-### 0.5 The self-adversarial gate — required before declaring any gate (BS-14)
+### 0.5 The self-adversarial gate — required before any gate is declared done (BS-14)
 
-**You attack your own output before you present it.** Answer all six in the deliverable, in
-writing:
+**You attack your own output before you present it.** Answer all six in the bundle README:
 
 1. **Where is each headline claim overstated?** Name the specific word doing unearned work.
 2. **What specific alternative explanation** would produce this exact number?
@@ -82,9 +86,9 @@ writing:
 5. **Which numbers have no producing script?** Tag them `[UNVERIFIED]`.
 6. **What did you withdraw or weaken?**
 
-> ⚠️ **A gate with nothing withdrawn or weakened is a gate that was not attacked, and it will
-> be read that way.** If genuinely nothing survived attack, say so explicitly and show what
-> you tried. Record the attempt; never manufacture a withdrawal.
+> ⚠️ **A gate with nothing withdrawn or weakened is a gate that was not attacked.** If
+> genuinely nothing survived attack, say so and show what you tried. Record the attempt;
+> never manufacture a withdrawal.
 
 ### 0.6 Interpretation (WA-I.1)
 
@@ -98,8 +102,8 @@ Between gates, work autonomously — do not ask permission for ordinary reads or
 calls. **At a gate: write the deliverable, update `STATUS.md`, and PAUSE for approval.**
 
 **Stop and report** — do not improvise past any of these: a missing tool, or one that runs
-and produces nothing usable on real data; a path that is not where this launcher says;
-a file you would have to modify; a result that contradicts this launcher.
+and produces nothing usable on real data; a path that is not where this launcher says; a file
+you would have to modify; a result that contradicts this launcher.
 
 Everything else follows WA-S.4 — LOW-STAKES takes the default and logs it, HIGH-STAKES stops.
 
@@ -110,30 +114,44 @@ cd <project root>
 export PATH=<env bin>:$PATH        # never base
 ```
 
-Machine rule: anything >10 min states where it runs and why. Validate the harness in a ~60 s
-interactive session before queueing anything (WA-K.2). Size from a measured smoke rate, never
-a guess (WA-K.3), on a representative sample (WA-K.4). Submit cheap gating jobs before large
-arrays (WA-K.5). Details: `general/site/COMPUTE.md`.
+Anything >10 min states where it runs and why. Validate the harness in a ~60 s interactive
+session before queueing (WA-K.2). Size from a measured smoke rate on a representative sample
+(WA-K.3, WA-K.4). Submit cheap gating jobs before large arrays (WA-K.5).
+Details: `general/site/COMPUTE.md`.
 
 ---
 
-## 1 · Objective and success criterion
+## 1 · Objective, success criterion, kill criteria
 
 **Objective.** <one sentence: what this track produces>
 
-**Success criterion.** <how the operator will know it is done AND correct — never "it ran">
+**Success criterion.** <how you will know it is done AND correct — never "it ran">
+
+**Kill criteria.** What would make you abandon this track — written now, while you are not
+invested. A track with no kill criterion cannot fail; it can only be extended.
+
+- <the measurement result that means stop>
+- <the cost or time that means stop>
 
 ---
 
-## 2 · Out of scope
+## 2 · Out of scope, and non-goals
 
-Be explicit. This section prevents most drift; "everything not mentioned above" is not a list.
+Explicit, and the section that prevents most drift. "Everything not mentioned above" is not
+a list.
 
-- <the adjacent work a session will be tempted into, and that this track is not>
+**Not this track** — adjacent work a session will be tempted into:
+
+- <…>
+
+**Non-goals — declined permanently, not deferred.** A sentence you can point at when a
+session proposes it:
+
+- <…>
 
 **Settled and not to be re-litigated here:**
 
-- <question> — settled by `docs/decisions/<nnnn>-<slug>.md>`
+- <question> — settled by `docs/decisions/<nnnn>-<slug>.md`
 
 ---
 
@@ -147,18 +165,52 @@ An ungraded input is DO-NOT-USE. A FROZEN row with no bundle id is not FROZEN.
 
 ---
 
+## 3b · Claims this track settles
+
+The ledger for this track. **A claim exists here as UNPROVEN before the gate that settles it
+runs** (CL-1). Ids are scoped to the track — `<track>:C1` — so they cannot collide with
+another launcher's.
+
+This table is the operator's (CL-2). A session proposes a paste-ready block in its bundle
+README; it never edits this file.
+
+| ID | Claim — value, unit, denominator, scope | Grade | Circ. | Status | Settled by | Date |
+|----|------------------------------------------|-------|-------|--------|-----------|------|
+| `<track>:C1` | | — | | UNPROVEN | — | |
+
+Grade: `MEASURED` · `DERIVED` · `INFERRED`. One INFERRED element makes the whole claim
+INFERRED (EVIDENCE_STANDARDS §1c). Circularity: `NONE` · `LOW` · `MEDIUM` · `HIGH` (§3).
+Status: `UNPROVEN` · `SUPPORTED` · `REFUTED` · `WITHDRAWN`.
+
+**A refutation is a result and lands like any other** (CL-3). A claim is never rescued by
+qualification: if the measurement splits it, both halves are reported and it settles as the
+weaker one (CL-6). A claim becomes SUPPORTED only after the operator signs off in their own
+words (CL-5, WA-I.2).
+
+---
+
 ## 4 · Gates
 
-| gate | measurement | mode | stop condition | gated on |
-|---|---|---|---|---|
-| | | SINGLE-PASS / LOOPED | done when `results/<GATE>/` exists and re-running `run.sh` from the hashed inputs reproduces <the number> | — |
+| gate | measurement | weight | mode | stop condition | claim | gated on |
+|---|---|---|---|---|---|---|
+| `<track>-g1` | | LIGHT / FULL | SINGLE-PASS / LOOPED | done when `results/<gate>/` exists and re-running `run.sh` from the hashed inputs reproduces <the number> | `<track>:C1` | — |
 
-A LOOPED gate's stop condition **contains a number** and a round budget (WA-L.2). A loop may
-DRIVE but may not ACQUIT: it decides whether a step is complete, never whether a result is
-correct or good enough.
+**Weight** (WA-B.5) — pay for controls where a claim rests on the number:
+
+- **LIGHT** — the provenance skeleton only: inputs hashed, environment locked, scripts
+  verbatim, `run.sh` reruns. No bespoke control fixture. For recon, feasibility, "how many
+  are there", "does this tool run on real data". **A LIGHT number may not enter a claim, a
+  figure, or the paper** — it is orientation, and promoting it means a new FULL bundle.
+- **FULL** — everything: declared thresholds, positive control per zero, the denominator's
+  independent second count, the hand-checked fixture. Required the moment a number becomes a
+  claim, a figure, or paper text.
+
+**Mode** (WA-L.2) — a LOOPED gate's stop condition contains a number and a round budget. A
+loop may DRIVE but may not ACQUIT: it decides whether a step is complete, never whether a
+result is correct.
 
 **Dependency graph** — independent gates may run in parallel sessions or on different
-machines, and that is the reason this is a track rather than a queue:
+machines, and that is why this is a track rather than a queue:
 
 ```
   <g1> ──► <g2> ──► <g4>
@@ -178,5 +230,9 @@ machines, and that is the reason this is a track rather than a queue:
 
 ## 6 · Deliverables
 
-Per gate: a bundle at `results/<GATE>/` per `general/agreements/BUNDLE_SPEC.md`, and a retro
+Per gate: a bundle at `results/<gate>/` per `general/agreements/BUNDLE_SPEC.md`, and a retro
 at `retros/YYYY-MM-DD_<gate>.md`. Nothing else is a deliverable.
+
+Assemble a bundle with `bash general/tools/bundle.sh <gate>`; it does the fixed work — hashes
+inputs, locks the environment, copies scripts verbatim, writes `PROVENANCE.md` — so the
+session's effort goes to the controls, not the paperwork.
