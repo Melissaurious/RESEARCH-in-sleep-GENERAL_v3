@@ -30,8 +30,16 @@ say "layer mounted at general/ ($(git -C general rev-parse --short HEAD))"
 
 cp general/templates/PROJECT_CLAUDE.md CLAUDE.md
 cp general/templates/LAUNCHER.md launchers/LAUNCHER_TEMPLATE.md
-cp general/templates/gitignore .gitignore
-cp general/templates/settings.json .claude/settings.json
+# __SCRATCH__ is a placeholder in the templates; substitute the project's scratch dir name.
+# Left unsubstituted, allowWrite names a directory that does not exist and the first gate
+# cannot write anything - which is how it shipped once, and the failure looked like a
+# permissions mystery rather than a template bug.
+sed 's|__SCRATCH__|ARIS_OUTPUT|g' general/templates/gitignore     > .gitignore
+sed 's|__SCRATCH__|ARIS_OUTPUT|g' general/templates/settings.json > .claude/settings.json
+python3 -c "import json,sys; json.load(open('.claude/settings.json'))" \
+  || { echo "settings.json does not parse after substitution" >&2; exit 1; }
+grep -q '__SCRATCH__' .gitignore .claude/settings.json \
+  && { echo "__SCRATCH__ survived substitution" >&2; exit 1; }
 printf '# BLOCKED\n\nOpen questions, timestamped: what is needed, why, the options, the\nrecommended default (WA-S.4).\n' > docs/BLOCKED.md
 printf '# LOG\n\nNotes that are not gates (RM-2).\n' > docs/log.md
 printf '# DATA REGISTER\n\nOne row per input: path, sha256, bytes, mode, and how it was obtained.\nInherited-baseline rows name their bundle or carry the `operator-supplied design\nfact` tag with a person and a date (WA-I.5).\n' > data/README.md

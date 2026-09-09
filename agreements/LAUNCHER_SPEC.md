@@ -69,6 +69,25 @@ An ungraded input is DO-NOT-USE. A FROZEN row with no bundle id is not FROZEN �
 RE-DERIVE, or it carries the `operator-supplied design fact` tag with a person and a date
 (WA-I.5).
 
+### ⛔ A launcher may not print a value one of its gates is meant to derive
+
+A launcher is read at the start of every session in its track. Any number in its body is in
+the model's context **before** the gate computes — so a target value written into a launcher
+destroys blind re-derivation for that claim permanently, and no later care recovers it.
+
+*Would have caught:* a launcher that stated a corpus record count in its units section, as
+background, while one of its own claims was "the record count is N". Every session that read
+the launcher held the answer before running anything, and the claim could only ever be
+reconciled, never derived.
+
+*Would wrongly reject:* a launcher that must state a **threshold** — 0.90, 95% — because a
+threshold declared before scoring is exactly what §5 requires, and hiding it would be worse.
+The rule is therefore about values a gate DERIVES, never about values the operator DECLARES.
+
+**In practice:** name the unit, not its size. *"the record count"*, not *"3,059,700 records"*.
+If a magnitude is genuinely needed for scoping, give an order — *"~3M records"* — and say it
+is an order, not the number under test.
+
 ### 4b · Claims this track settles
 
 The ledger, scoped to the track. **A claim is declared UNPROVEN here before the gate that
