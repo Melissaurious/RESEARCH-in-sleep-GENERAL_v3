@@ -72,7 +72,10 @@ TMP="$(mktemp)"
   fi
 
   printf '\n## Progress\n\n'
-  NU=$(grep -hoE 'UNPROVEN' launchers/*.md 2>/dev/null | wc -l); NU=${NU:-0}
+  # Count over the same set the tables above render, or the summary contradicts the
+  # body it summarises — and a rollup whose own numbers disagree is worse than none.
+  REAL=""; for L in launchers/*.md; do case "$L" in *TEMPLATE*) ;; *) [ -f "$L" ] && REAL="$REAL $L" ;; esac; done
+  NU=0; [ -n "$REAL" ] && { NU=$(grep -hoE 'UNPROVEN' $REAL 2>/dev/null | wc -l); NU=${NU:-0}; }
   NB=$(ls -1d results/*/ 2>/dev/null | wc -l)
   printf -- '- claims still UNPROVEN: **%s**\n' "${NU:-0}"
   printf -- '- bundles landed: **%s**\n' "$NB"
