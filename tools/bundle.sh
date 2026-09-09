@@ -17,17 +17,34 @@ cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 ROOT="$(pwd)"
 
 GATE="${1:-}"; shift || true
-[ -n "$GATE" ] || { echo "usage: bash general/tools/bundle.sh <gate-id> [--seed N] [--models \"a,b\"]" >&2; exit 2; }
-SEED=""; MODELS=""
+[ -n "$GATE" ] || { echo "usage: bash general/tools/bundle.sh <gate-id> [--seed N] [--models \"a,b\"] [--scratch DIR]" >&2; exit 2; }
+SEED=""; MODELS=""; SCRATCH_OVERRIDE=""
 while [ $# -gt 0 ]; do
   case "$1" in
-    --seed)   SEED="${2:-}"; shift 2 ;;
+    --seed)    SEED="${2:-}"; shift 2 ;;
+    --scratch) SCRATCH_OVERRIDE="${2:-}"; shift 2 ;;
     --models) MODELS="${2:-}"; shift 2 ;;
     *) echo "unknown flag: $1" >&2; exit 2 ;;
   esac
 done
 
-SCRATCH="ARIS_OUTPUT/$GATE"
+# A launcher's write boundary is per TRACK (ARIS_OUTPUT/<track>/), so a gate's scratch is
+# usually NESTED: ARIS_OUTPUT/<track>/<gate>. Assuming a flat ARIS_OUTPUT/<gate> made this
+# script miss the directory and forced a symlink workaround in a real gate. Resolve the flat
+# path, then the nested one, then accept an explicit --scratch.
+if [ -n "${SCRATCH_OVERRIDE:-}" ]; then
+  SCRATCH="$SCRATCH_OVERRIDE"
+elif [ -d "ARIS_OUTPUT/$GATE" ]; then
+  SCRATCH="ARIS_OUTPUT/$GATE"
+else
+  # one level down: ARIS_OUTPUT/*/<gate>, or ARIS_OUTPUT/*/<gate-without-track-prefix>
+  SHORT="${GATE#*-}"
+  SCRATCH=""
+  for c in ARIS_OUTPUT/*/"$GATE" ARIS_OUTPUT/*/"$SHORT"; do
+    [ -d "$c" ] && { SCRATCH="$c"; break; }
+  done
+  [ -n "$SCRATCH" ] || SCRATCH="ARIS_OUTPUT/$GATE"   # report the flat path in the error
+fi
 B="results/$GATE"
 [ -d "$SCRATCH" ] || { echo "no scratch directory: $SCRATCH" >&2; exit 1; }
 [ -e "$B" ] && { echo "REFUSING: $B exists. Bundles are write-once (BS-6) — a correction is a NEW bundle id naming its predecessor." >&2; exit 1; }

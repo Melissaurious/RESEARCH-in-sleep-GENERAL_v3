@@ -16,6 +16,7 @@
       "Bash(bash general/checks/:*)", "Bash(bash general/tools/general_sha.sh:*)",
       "Bash(bash tools/:*)",
       "Edit(__SCRATCH__/**)", "Write(__SCRATCH__/**)",
+      "Edit(data/**)", "Write(data/**)",
       "Edit(results/**)", "Write(results/**)",
       "Edit(retros/**)", "Write(retros/**)",
       "Edit(docs/**)", "Write(docs/**)"
@@ -51,7 +52,7 @@
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
     "filesystem": {
-      "allowWrite": ["__SCRATCH__", "results", "retros", "docs", ".agent-lock"]
+      "allowWrite": ["__SCRATCH__", "results", "retros", "docs", "data", ".agent-lock"]
     },
     "network": {
       "allow": ["api.anthropic.com", "github.com", "api.github.com"]
