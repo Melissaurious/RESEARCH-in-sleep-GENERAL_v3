@@ -283,6 +283,15 @@ second checkout (`tools/worktree.sh`) is needed ONLY when two gates compute at t
 and both will COMMIT — that is the single thing one directory cannot do, because they collide
 on the git index and on the lock. Remove a worktree when its gate lands; a tree that outlives
 its gate is a stale checkout carrying stale governance.
+
+⚠️ **A worktree isolates the working directory, NOT `.git`.** Worktrees share the object
+store, the refs, and `.git/config`. So `git worktree add` while another session is mid-git
+operation can race and leave a `.git/config.lock` behind, and the agent lock does not prevent
+it — that lock guards the working directory, which is not what is being contended.
+
+**Create or remove a worktree when no other session is running git.** A stale `*.lock` under
+`.git/` with no `git` process alive is safe to delete; one with a live `git` process is not,
+and the check is `pgrep git`, not the file's age.
 - check: `checks/no_concurrent_writer.sh` (SessionStart hook)
 - validated: 2026-08-31 — files appeared mid-run during a stage and were recorded as blocked
 
