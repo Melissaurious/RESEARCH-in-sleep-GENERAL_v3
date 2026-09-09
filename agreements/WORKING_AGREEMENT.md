@@ -412,6 +412,30 @@ silence.
 - validated: 2026-09-06 — a strand-mismatch counter would not have appeared in the output at
   all, and an invisible zero is indistinguishable from an unasked question
 
+**WA-K.7** [WHEN reusing a prior script, report or run] A prior artifact is a **source of
+ideas, never an authority**. Before it is reused, its *design* is assessed and the assessment
+is written down: what it actually did, what it assumed, where it is wrong or unstated. Reuse
+then names which parts were kept, which were changed, and why.
+
+This is separate from WA-D.6, which governs prior *numbers*. A method can be reused with its
+numbers properly sealed and still carry a defect straight into the new work, because the
+defect is in the procedure rather than in the value.
+
+**Archaeology is not the job.** Reconciling a prior run's counts is worth doing only when a
+current claim depends on the answer. Understanding *how the data was produced* — the
+mechanism, the acquisition step, the unstated decisions — is always worth doing, because that
+is what gets inherited whether or not anyone notices.
+- check: `manual` — the bundle README names what was ported, what changed, and what was found
+  wrong in the original
+- validated: 2026-09-09 — *would have caught:* a set of reference artifacts carried forward for
+  months with a filename asserting one count, a body holding another, and no record of how the
+  underlying data was acquired; the operator's standing position was *"I was never sure if
+  they were correct."*
+  *Would wrongly reject:* a script reused verbatim precisely because it is the artifact under
+  audit — where changing anything would destroy the comparison. There the assessment is
+  written and the code is left alone, which the rule permits: it requires the assessment, not
+  a modification.
+
 **WA-E.6** [WHEN using an external tool] Open its flags before trusting its defaults, and ask
 what object its output actually contains. Grade the tool by execution on real project data,
 never by presence. → `agreements/EVIDENCE_STANDARDS.md` §2.
