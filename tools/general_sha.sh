@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Print the revision of the agreements layer, for BS-10 (`agreements: <sha>`).
 #
-#   bash agreements/agreements_sha.sh
+#   bash general/tools/general_sha.sh
 #
 # Works whether this directory is a git submodule (its own HEAD), a subtree, or a
 # plain directory in the host repo (the host's last commit that touched it).

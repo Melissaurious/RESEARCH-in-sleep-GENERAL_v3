@@ -30,7 +30,7 @@ cd "$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 ROOT="$(pwd)"
 
 NAME="${1:-}"
-[ -n "$NAME" ] || { echo "usage: bash tools/worktree.sh <name> [row ...]"; exit 2; }
+[ -n "$NAME" ] || { echo "usage: bash tools/worktree.sh <name> [gate ...]"; exit 2; }
 shift
 ROWS="$*"
 
@@ -58,11 +58,11 @@ git -C "$WT" submodule update --init --recursive -q || { say "submodule init FAI
 # it checks against the CURRENT directory, so running it by absolute path from the main
 # checkout audits the main checkout and reports on the wrong tree - which is how the first
 # version of this line reported FAILED while the very next line printed OK.
-if ( cd "$WT" && bash agreements/checks/specs_exist.sh ) >/dev/null 2>&1; then
+if ( cd "$WT" && bash general/checks/specs_exist.sh ) >/dev/null 2>&1; then
   say "specs_exist OK — the tree is governed"
 else
-  say "!! specs_exist FAILED in $WT — do not start a row there"
-  ( cd "$WT" && bash agreements/checks/specs_exist.sh ) 2>&1 | head -10
+  say "!! specs_exist FAILED in $WT — do not start a gate there"
+  ( cd "$WT" && bash general/checks/specs_exist.sh ) 2>&1 | head -10
   exit 1
 fi
 
@@ -72,7 +72,7 @@ else
   say "lock free in the new tree"
 fi
 
-say "agreements $(bash "$WT/agreements/agreements_sha.sh" 2>/dev/null) - base $(git -C "$WT" rev-parse --short HEAD)"
+say "general $(bash "$WT/general/tools/general_sha.sh" 2>/dev/null) - base $(git -C "$WT" rev-parse --short HEAD)"
 echo
 echo "  cd $WT"
 if [ -n "$ROWS" ]; then

@@ -90,7 +90,7 @@ git checkout -q -B "$BRANCH" origin/main || { say "could not branch from origin/
 PROMPT="You are running an ADVERSARIAL READ of a research repository. You did not write any
 of this. Your job is to try to break it, not to summarise it.
 
-Read \`CLAIMS.md\`, \`agreements/EVIDENCE_STANDARDS.md\`, \`agreements/BUNDLE_SPEC.md\`, and
+Read \`CLAIMS.md\`, \`general/agreements/EVIDENCE_STANDARDS.md\`, \`general/agreements/BUNDLE_SPEC.md\`, and
 every bundle under \`results/\`. These bundles are new since the last review and are where
 to concentrate: $(printf '%s ' $NEW)
 
