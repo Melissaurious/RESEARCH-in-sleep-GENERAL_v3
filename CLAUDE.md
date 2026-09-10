@@ -37,7 +37,7 @@ When the situation applies:
     paper/                assembled from SUPPORTED claims only (BS-7)
 
 A **track** is the unit of scope; a **gate** is the unit of a number. One gate = one
-measurement = one session = one bundle = one branch (WA-R.1).
+measurement = one session = one bundle = one DIRECTORY (WA-R.1).
 
 **Progress is not how much you have done.** It is how many claims left UNPROVEN, and whether
 any went to REFUTED. A week with three REFUTED claims and no SUPPORTED ones is a good week;

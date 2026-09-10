@@ -28,7 +28,14 @@
 set -uo pipefail
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-LOCK="${AGENT_LOCK:-$ROOT/.agent-lock}"
+# Per-task lock (0004): a task is isolated by its directory, so its lock lives there.
+# AGENT_LOCK_SCOPE=task + TASK=<name> -> ARIS_OUTPUT/<task>/.lock ; otherwise checkout-wide.
+if [ "${AGENT_LOCK_SCOPE:-checkout}" = "task" ] && [ -n "${TASK:-}" ]; then
+  LOCK="${AGENT_LOCK:-$ROOT/ARIS_OUTPUT/$TASK/.lock}"
+  mkdir -p "$(dirname "$LOCK")"
+else
+  LOCK="${AGENT_LOCK:-$ROOT/.agent-lock}"
+fi
 STALE_MIN="${STALE_MIN:-120}"
 HOST="$(hostname 2>/dev/null || echo unknown-host)"
 
