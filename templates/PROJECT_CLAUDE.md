@@ -64,3 +64,31 @@ there are none — an empty conventions list is better than an invented one.>
 A count of zero needs a positive control that the same code returns non-zero on a case known
 to be present (EVIDENCE_STANDARDS §6). This project inherits none — every gate supplies its
 own.
+
+---
+
+## ARIS pipeline state
+
+_ARIS reads this file for research context and pipeline state. Keep these fields — its
+skills consume them, and an empty one is read as "not set", not as "not applicable"._
+
+| | |
+|---|---|
+| Research direction | `[the problem statement, one paragraph]` |
+| Current stage | `[idea-discovery \| contract \| experiment-plan \| running \| review \| narrative \| paper]` |
+| Target venue | `[journal or conference, or "thesis chapter N"]` |
+| `AUTO_PROCEED` | `[true]` — **ARIS defaults to false.** Set it deliberately, or every loop stops at a gate waiting for someone who is asleep. |
+| Executor / reviewer | `[Opus 5 High]` / `[codex gpt-5.6-sol]` — `claude_profile.json` |
+| Compute budget | see `launchers/LAUNCHER_<track>.md` §9 |
+| Effort levels | `[skill:effort pairs, if you override defaults]` |
+
+## Governance
+
+This project is governed by `general/` — the working agreements constrain **how** ARIS
+works; they do not replace **what** ARIS does. ARIS owns the pipeline, its artifacts
+(`.aris/`, `research-wiki/`, `paper/`, `EXPERIMENT_PLAN.md`, `EXPERIMENT_LOG.md`) and its
+loops. `general/` owns data integrity, evidence standards, report quality, compute policy,
+Ibex usage, and which decisions are reserved for Melissa.
+
+    bash general/checks/specs_exist.sh      # must print OK before any gate
+    python3 general/tools/check_launcher.py launchers/LAUNCHER_<track>.md

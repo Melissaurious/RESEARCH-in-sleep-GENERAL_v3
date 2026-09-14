@@ -177,12 +177,22 @@ cannot assess independence they cannot see.
 Two methods agreeing is evidence **only if they can disagree**. Methods sharing a hidden
 dependency agree whenever that dependency is wrong.
 
-**Do:** declare each method's **evidence sources** as a set, then compute independence as
-the Jaccard distance between source sets. Assert it; do not assume it.
+**Do:** declare each method's **evidence sources** as a set, then compute the Jaccard
+distance between source sets as a **provenance-overlap indicator**. Assert it; do not assume it.
+
+⚠️ **Do NOT treat that number as a validated measure of methodological independence.** It
+detects *shared provenance*, which is one cause of correlated error and not the only one —
+two methods with disjoint source sets can still share an assumption, a preprocessing step,
+or an author. A high score is weak evidence of independence; a **low** score is strong
+evidence of dependence, and that asymmetry is where its value lies. Use it to *disqualify*
+pairs, never to certify them.
 
 **Do:** declare the acceptance rule **before** computing the matrix — e.g. *"a claim is
-admissible only if two methods with independence ≥ X agree, and at least one has
-circularity NONE or LOW"*.
+admissible only if two methods agree whose provenance overlap is below X, at least one has
+circularity NONE or LOW, and the shared-assumption check below has been answered in writing"*.
+
+**Do:** answer in writing, for every pair you rely on: *what would make BOTH of these wrong
+at once?* A pair with no such answer has not been shown independent, whatever the score.
 
 **Do:** state explicitly which pairs **cannot** cross-check each other, and why.
 

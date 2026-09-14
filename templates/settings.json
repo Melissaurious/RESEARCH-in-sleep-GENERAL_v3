@@ -2,24 +2,67 @@
   "cleanupPeriodDays": 45,
   "permissions": {
     "allow": [
-      "Read", "Glob", "Grep",
-      "Bash(ls:*)", "Bash(cat:*)", "Bash(head:*)", "Bash(tail:*)", "Bash(wc:*)",
-      "Bash(grep:*)", "Bash(rg:*)", "Bash(cut:*)", "Bash(column:*)", "Bash(awk:*)",
-      "Bash(sort:*)", "Bash(uniq:*)", "Bash(mkdir:*)", "Bash(mv:*)", "Bash(find:*)",
-      "Bash(sha256sum:*)", "Bash(md5sum:*)", "Bash(stat:*)", "Bash(dd:*)",
-      "Bash(df:*)", "Bash(du:*)", "Bash(free:*)", "Bash(nproc:*)", "Bash(nvidia-smi:*)",
-      "Bash(python:*)", "Bash(python3:*)", "Bash(conda list:*)", "Bash(conda env export:*)",
-      "Bash(git status:*)", "Bash(git diff:*)", "Bash(git log:*)", "Bash(git show:*)",
-      "Bash(git add:*)", "Bash(git commit:*)", "Bash(git checkout -b:*)", "Bash(git push:*)",
-      "Bash(squeue:*)", "Bash(sbatch:*)", "Bash(sacct:*)", "Bash(scancel:*)",
-      "Bash(sinfo:*)", "Bash(srun:*)", "Bash(seff:*)", "Bash(ssh:*)", "Bash(rsync:*)",
-      "Bash(bash general/checks/:*)", "Bash(bash general/tools/general_sha.sh:*)",
+      "Read",
+      "Glob",
+      "Grep",
+      "Bash(ls:*)",
+      "Bash(cat:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(wc:*)",
+      "Bash(grep:*)",
+      "Bash(rg:*)",
+      "Bash(cut:*)",
+      "Bash(column:*)",
+      "Bash(awk:*)",
+      "Bash(sort:*)",
+      "Bash(uniq:*)",
+      "Bash(mkdir:*)",
+      "Bash(mv:*)",
+      "Bash(find:*)",
+      "Bash(sha256sum:*)",
+      "Bash(md5sum:*)",
+      "Bash(stat:*)",
+      "Bash(dd:*)",
+      "Bash(df:*)",
+      "Bash(du:*)",
+      "Bash(free:*)",
+      "Bash(nproc:*)",
+      "Bash(nvidia-smi:*)",
+      "Bash(python:*)",
+      "Bash(python3:*)",
+      "Bash(conda list:*)",
+      "Bash(conda env export:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git checkout -b:*)",
+      "Bash(git push:*)",
+      "Bash(squeue:*)",
+      "Bash(sbatch:*)",
+      "Bash(sacct:*)",
+      "Bash(scancel:*)",
+      "Bash(sinfo:*)",
+      "Bash(srun:*)",
+      "Bash(seff:*)",
+      "Bash(ssh:*)",
+      "Bash(rsync:*)",
+      "Bash(bash general/checks/:*)",
+      "Bash(bash general/tools/general_sha.sh:*)",
       "Bash(bash tools/:*)",
-      "Edit(__SCRATCH__/**)", "Write(__SCRATCH__/**)",
-      "Edit(data/**)", "Write(data/**)",
-      "Edit(results/**)", "Write(results/**)",
-      "Edit(retros/**)", "Write(retros/**)",
-      "Edit(docs/**)", "Write(docs/**)"
+      "Edit(__SCRATCH__/**)",
+      "Write(__SCRATCH__/**)",
+      "Edit(data/**)",
+      "Write(data/**)",
+      "Edit(results/**)",
+      "Write(results/**)",
+      "Edit(retros/**)",
+      "Write(retros/**)",
+      "Edit(docs/**)",
+      "Write(docs/**)"
     ],
     "deny": [
       "Bash(rm:*)",
@@ -52,18 +95,61 @@
     "enabled": true,
     "autoAllowBashIfSandboxed": true,
     "filesystem": {
-      "allowWrite": ["__SCRATCH__", "results", "retros", "docs", "data", ".agent-lock"]
+      "allowWrite": [
+        ".aris",
+        ".claude",
+        "research-wiki",
+        "paper",
+        "figures",
+        "idea-stage",
+        "refine-logs",
+        "review-stage",
+        "EXPERIMENT_PLAN.md",
+        "EXPERIMENT_LOG.md",
+        "NARRATIVE_REPORT.md",
+        "MANIFEST.md",
+        "GAP_REPORT.md",
+        "KILL_ARGUMENT.md",
+        "KILL_ARGUMENT.json",
+        "claude_profile.json",
+        "INDEX.md",
+        "__SCRATCH__",
+        "results",
+        "retros",
+        "docs",
+        "data",
+        "sidework",
+        ".agent-lock"
+      ]
     },
     "network": {
-      "allow": ["api.anthropic.com", "github.com", "api.github.com"]
+      "allow": [
+        "api.anthropic.com",
+        "github.com",
+        "api.github.com"
+      ]
     }
   },
   "hooks": {
     "SessionStart": [
-      { "hooks": [ { "type": "command", "command": "bash general/checks/no_concurrent_writer.sh" } ] }
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash general/checks/no_concurrent_writer.sh"
+          }
+        ]
+      }
     ],
     "SessionEnd": [
-      { "hooks": [ { "type": "command", "command": "bash general/checks/no_concurrent_writer.sh --release" } ] }
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash general/checks/no_concurrent_writer.sh --release"
+          }
+        ]
+      }
     ]
   }
 }

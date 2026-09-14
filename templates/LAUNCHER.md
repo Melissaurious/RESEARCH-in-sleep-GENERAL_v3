@@ -69,13 +69,32 @@ Required the moment a number becomes a claim (WA-B.3). Start LIGHT unless it is 
 - Size from a **measured** smoke test on a representative slice, never the head of a file
   (WA-K.1). Thresholds: `general/site/COMPUTE.md`.
 
-## 9. Autonomy
+## 9. Autonomy envelope
 
-**Decide alone and continue** (log in `docs/BLOCKED.md`): `[anything reversible, contained,
-under 10 min of compute, inside the gate's scratch]`
+**Auto-proceed:** `[true]` — ARIS's `AUTO_PROCEED` defaults to **false**; set it here
+deliberately or the loop stops at every gate waiting for someone who is asleep.
 
-**Stop and wait**: `[deleting or overwriting anything, compute over the budget, changing a
-spec, publishing]`
+**Compute budget** — the envelope replaces time-based approval. Inside it, do not ask:
 
-**Review rounds before halting:** `[3]`. A budget-halt is reported as a budget-halt, never
-as a pass (WA-A.3).
+| | budget |
+|---|---|
+| CPU-hours | `[100]` |
+| GPU-hours | `[12]` |
+| max single job | `[6]` hr |
+| review rounds per gate | `[3]` |
+
+**Decide alone and continue** (log in `docs/BLOCKED.md`): anything reversible, inside the
+budget, inside the gate's scratch. Implement → smoke-test → fail → debug → rerun → reviewer
+objects → add control → rerun → report, all without waking anyone.
+
+**Human gate — stop and wait.** These are the only ones:
+- modifying ground truth, or deleting/replacing canonical data
+- changing the scientific question, or a frozen evaluation criterion
+- exceeding the compute budget above
+- promoting an interpretation to a paper or thesis claim
+- anything published or sent outside this machine
+
+⭐ Note what is **not** on that list: interpreting a result. The agent may generate
+interpretations, compare competing explanations, flag surprises and rank them by evidence —
+it may not *declare one established* (WA-A.4). A budget-halt is reported as a budget-halt,
+never as a pass (WA-A.3).

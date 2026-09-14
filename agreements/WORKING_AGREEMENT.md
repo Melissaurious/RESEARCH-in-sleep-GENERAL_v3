@@ -39,7 +39,8 @@ the ugly ones. Interpretation lands as `PROPOSED:` and becomes the operator's by
 
 **WA-A.5** [ALWAYS] **The reviewer is a different model family from the author**, and read-only.
 `EVIDENCE_STANDARDS` §4 applied to the review itself: agreement is evidence only if
-disagreement was possible.
+disagreement was possible. This governs **our two gates** (plan, result) and is **additional
+to** ARIS's own reviewer routing — never a global replacement for it. More review, not less.
 - check: `tools/review.sh` refuses a same-family reviewer
 - validated: 2026-09-14 — the previous adversary defaulted to the author's own family
 
@@ -129,10 +130,16 @@ intended, not as it is; where they diverge the values win and the schema is corr
 
 ## B — The bundle
 
-**WA-B.1** [ALWAYS] Numbers go to `results/<GATE>/` and nowhere else. Scratch goes to
-`ARIS_OUTPUT/<gate>/` — gitignored, disposable, **expected to be messy.**
+**WA-B.1** [ALWAYS] **Numbers** go to `results/<GATE>/` and nowhere else; **scratch** goes to
+`ARIS_OUTPUT/<gate>/` — gitignored, disposable, expected to be messy. This governs *numbers
+and scratch only*. **ARIS's control artifacts are not outputs and this rule does not touch
+them**: `.aris/`, `research-wiki/`, `paper/`, `idea-stage/`, `refine-logs/`, `review-stage/`,
+`EXPERIMENT_PLAN.md`, `EXPERIMENT_LOG.md`, `MANIFEST.md` are the interfaces ARIS skills use
+to talk to each other, and they live where ARIS expects them.
 - check: `checks/bundle_valid.sh`
-- validated: 2026-09-04 — numbers scattered across scratch, none citable
+- validated: 2026-09-14 — an earlier form said *all* outputs go to `ARIS_OUTPUT/` and named a
+  parallel top-level dir a defect. Applied to ARIS that is not a tidiness rule, it is an
+  outage: the sandbox blocked `refine-logs/` and the skills went inert with nothing to read.
 
 **WA-B.2** [ALWAYS] A gate is done when `run.sh` **reruns and reproduces the number**, not when
 a document is written. The validator checks that files exist and hashes match; only a rerun

@@ -15,11 +15,31 @@ the cluster over SSH.** Full reference, with what is verified and what is transc
 
     IBEX="rioszemm@ilogin.ibex.kaust.edu.sa"      # a STABLE login node, not the vscode pool
 
+## This is an ADAPTER, not a replacement
+
+It plugs into ARIS's artifact contracts — it does not invent a parallel pipeline:
+
+| ARIS artifact | this skill |
+|---|---|
+| `EXPERIMENT_PLAN.md` | **reads** it — the measurement, inputs and success criterion come from here |
+| `results/` | **writes** output tables where ARIS expects them |
+| `EXPERIMENT_LOG.md` | **appends** the timestamped run record: job id, partition, requested vs used, counts |
+| `MANIFEST.md` | **appends** provenance for what landed |
+
+Everything else about the gate stays ARIS's. This skill owns exactly one thing: **getting
+the job onto SLURM correctly and reading it back honestly.**
+
 ## The flow
 
-    plan → preflight (interactive) → smoke job → size from sacct/seff
-         → generate script → sbatch --parsable → capture ID → watch → collect
-         → validate by CONTENT → EXPERIMENT_LOG.md → next gate
+    read EXPERIMENT_PLAN.md → tools/dispatch.py (local or Ibex, with a stated reason)
+         → preflight (interactive) → representative smoke job → size from sacct/seff
+         → generate script → sbatch --parsable → record JOB_ID → squeue/sacct
+         → collect → validate by CONTENT → append EXPERIMENT_LOG.md → next gate
+
+    python general/tools/dispatch.py --est-minutes <n> [--gpu --vram <gb>] --explain
+
+`dispatch.py` decides local-vs-Ibex and prints an auditable reason. Paste that reason into
+`EXPERIMENT_PLAN.md`. If it says local, **stop here** — this skill is for cluster work.
 
 Do not skip to `sbatch`. Steps 1–3 cost minutes; skipping them costs a queue cycle, and
 queue latency is the dominant cost on this cluster.
@@ -143,11 +163,19 @@ parseability, expected record count, and an asserted invariant. **Then count the
 that actually produced output** — a partially failed array looks like a successful one from
 `squeue`, and `n_attempted / n_succeeded / n_dropped` is required in the bundle README.
 
-## 7 · Record
+## 7 · Record — into ARIS's artifacts, where the next skill will look
 
-Append to the gate's `EXPERIMENT_LOG.md`: job ID, partition, requested vs used
-(`seff`), wall time, n_attempted/n_succeeded/n_dropped, and what the next job should request
-instead. That last field is what makes the next gate cheaper.
+**Append** to `EXPERIMENT_LOG.md` (never overwrite — it is a timestamped run record):
+
+    ## <date> · <gate> · job <JOB_ID>
+    partition     <p>            array      <0-N%K>
+    requested     <cpus/mem/time>
+    used (seff)   <Elapsed> · MaxRSS <x> · Mem eff <y>% · CPU eff <z>%
+    counts        n_attempted=<a> n_succeeded=<s> n_dropped=<d>   reason: <why>
+    next job      request <what> instead, because <the seff number>
+
+The last line is what makes the next gate cheaper, and it is the one most often skipped.
+A non-zero `n_dropped` is reported here and in the bundle README — **never footnoted.**
 
 ## Known failure modes — all seen on this cluster
 
