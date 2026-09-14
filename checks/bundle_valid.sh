@@ -266,7 +266,7 @@ validate() {
     while IFS= read -r f; do
       grep -qF "$(printf '%s\t' "$f")" "$B/OUTPUTS.tsv" \
         || { echo "BS-11: bundle file not listed in OUTPUTS.tsv: $f"; fail=1; }
-    done < <(cd "$B" && find . -type f ! -name OUTPUTS.tsv -printf '%P\n' | sort)
+    done < <(cd "$B" && find . -type f ! -name OUTPUTS.tsv -not -path './__pycache__/*' -not -path './*/__pycache__/*' -printf '%P\n' | sort)
   fi
 
   return $fail
@@ -280,7 +280,7 @@ outputs() {
   { printf 'path\tsha256\tbytes\n'
     while IFS= read -r f; do
       printf '%s\t%s\t%s\n' "$f" "$(sha256sum "$B/$f" | cut -d' ' -f1)" "$(stat -c%s "$B/$f")"
-    done < <(cd "$B" && find . -type f ! -name OUTPUTS.tsv -printf '%P\n' | sort)
+    done < <(cd "$B" && find . -type f ! -name OUTPUTS.tsv -not -path './__pycache__/*' -not -path './*/__pycache__/*' -printf '%P\n' | sort)
   } > "$B/OUTPUTS.tsv"
 }
 

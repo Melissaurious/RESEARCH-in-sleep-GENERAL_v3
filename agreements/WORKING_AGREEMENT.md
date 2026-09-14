@@ -119,6 +119,29 @@ intended, not as it is; where they diverge the values win and the schema is corr
 
 ## Bundling a number
 
+**WA-B.0** [WHEN starting a gate] A gate does not start in a checkout whose governance submodule is not
+at the revision that checkout's branch records. BS-10 writes the revision into every bundle
+and BS-6 makes bundles write-once, so a gate run under a stale pin seals the wrong sha into
+an artifact that cannot be corrected.
+
+A worktree carries its **own** submodule object store, so several checkouts of one project
+can sit at several governance revisions at once — and the divergence is invisible until
+something reads the gitlink.
+
+A branch pinning a revision different from `main`'s is **not** an error: that is how a pin
+moves, by a deliberate commit with a decision record. It is reported, not failed.
+It is scoped WHEN rather than ALWAYS deliberately: a script fires it at gate start, so it
+does not need to be paid on every turn of every session. A rule a check enforces at the right
+moment does not also need to sit in context.
+- check: `checks/specs_exist.sh` — FAILS on a submodule off its recorded gitlink, WARNS on a
+  branch pin differing from main's
+- validated: 2026-09-09 — *would have caught:* three checkouts of one project running at
+  three governance revisions simultaneously, one of them a gate that stopped rather than
+  land a knowingly-stale pin. Watched rejecting a submodule moved off its gitlink and
+  accepting it restored, in the selftest and in three real checkouts.
+  *Would wrongly reject:* a branch that has deliberately moved the pin ahead of main, which
+  is the normal way a layer revision is adopted — hence WARN, not FAIL, for that half.
+
 **WA-B.1** [WHEN producing a number] **Numbers** go to `results/<GATE>/` and nowhere else; **scratch** goes to
 `ARIS_OUTPUT/<gate>/` — gitignored, disposable, expected to be messy. This governs *numbers
 and scratch only*. **ARIS's control artifacts are not outputs and this rule does not touch
@@ -169,6 +192,35 @@ correct and necessary; it is not evidence and not progress.
 
 ## Compute, loops and sessions
 
+**WA-C.1** [WHEN more than one session may touch this checkout] One agent process writes to one checkout at a time. A second reader may
+think, review, and pair on design at any time; it may not hold open file handles on a tree
+another agent is writing.
+
+**One checkout is the normal case.** Sequential gates share one working directory, each in
+its own `ARIS_OUTPUT/<gate>/`; sessions that only read, analyse or explore share it too. A
+second checkout (a per-checkout working copy) is needed ONLY when two gates compute at the same time
+and both will COMMIT — that is the single thing one directory cannot do, because they collide
+on the git index and on the lock. Remove a worktree when its gate lands; a tree that outlives
+its gate is a stale checkout carrying stale governance.
+
+⚠️ **A worktree isolates the working directory, NOT `.git`.** Worktrees share the object
+store, the refs, and `.git/config`. So `git worktree add` while another session is mid-git
+operation can race and leave a `.git/config.lock` behind, and the agent lock does not prevent
+it — that lock guards the working directory, which is not what is being contended.
+
+**Create or remove a worktree when no other session is running git.** A stale `*.lock` under
+`.git/` with no `git` process alive is safe to delete; one with a live `git` process is not,
+and the check is `pgrep git`, not the file's age.
+- check: `checks/no_concurrent_writer.sh` (SessionStart hook)
+- validated: 2026-08-31 — files appeared mid-run during a stage and were recorded as blocked
+
+**WA-C.3** [WHEN judging whether a run is alive] Liveness is a claim and carries a grade.
+"That run is dead" is INFERRED unless both the process table AND the directory's newest mtime
+have been checked and recorded. A job that has written nothing for ten minutes is not dead.
+An exit code in 128–160 is a signal, not an error.
+- check: `manual`
+- validated: PROVISIONAL 2026-09-08
+
 **WA-K.1** [WHEN scheduling computation] **Choose the machine by measurement, not habit.** To the cluster when
 wall-clock > 2 hr, VRAM > 24 GB, or an exact pass does not fit in RAM (`site/COMPUTE.md`).
 Size from a measured smoke test on a representative slice — never the head of a file, never
@@ -208,6 +260,15 @@ reported as a pass.
 the ugly ones. Interpretation lands as `PROPOSED:` and becomes the operator's by reading it.
 - check: `manual`
 - validated: 2026-09-14 — the previous form was right about authorship, wrong about timing
+
+**WA-P.3** [WHEN proposing a rule, or reviewing one that keeps being broken] **A rule that
+could be a script must be a script.** A paragraph is an intention; a check is a gate. And a
+rule pointing at a file that does not exist is *silent* — it neither fires nor complains.
+- check: `checks/specs_exist.sh` (paths) and `checks/rule_ids_resolve.sh` (rule ids)
+- validated: 2026-09-14 — an adversarial pass specified for two days had never run, because
+  it called a script that did not exist; and cutting 43 rules left 21 citations pointing at
+  rules that no longer existed, which `specs_exist` did not catch because it validates paths
+  and not rule ids
 
 **WA-S.2** [WHEN closing a gate] Write `retros/YYYY-MM-DD_<gate>.md`. **A rule named in a retro
 but not landed in a spec does not exist.** A session proposes, never amends; a proposal names

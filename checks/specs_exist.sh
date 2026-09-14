@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Every file the read-first documents point an agent at must resolve.
-# A must-read that is missing is silent: the agent proceeds without it.
+# A must-read that is missing is silent: the agent proceeds without it (WA-P.3).
 #
 #   check:        bash agreements/checks/specs_exist.sh
 #   validate me:  SELFTEST=1 bash agreements/checks/specs_exist.sh

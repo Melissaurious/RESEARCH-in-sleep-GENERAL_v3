@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# — one agent process writes to one checkout at a time.
+# WA-C.1 — one agent process writes to one checkout at a time.
 #
 #   acquire (SessionStart hook):  bash agreements/checks/no_concurrent_writer.sh
 #   release (SessionEnd  hook):   bash agreements/checks/no_concurrent_writer.sh --release
@@ -13,7 +13,7 @@
 #      the agent finishes a RESPONSE, so protection lasted one turn.
 #   2. Liveness is host-scoped. A pid written on another machine says nothing
 #      about a process here, and shared home directories make that a real case.
-#      A lock from another host is never judged dead: it blocks and asks.
+#      A lock from another host is never judged dead: it blocks and asks (WA-C.3).
 #
 #   3. The recorded pid is the SESSION, not the hook's parent. `$PPID` inside a
 #      SessionStart hook is the transient shell the harness spawned to run it; that
@@ -28,7 +28,14 @@
 set -uo pipefail
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
-LOCK="${AGENT_LOCK:-$ROOT/.agent-lock}"
+# Per-task lock (0004): a task is isolated by its directory, so its lock lives there.
+# AGENT_LOCK_SCOPE=task + TASK=<name> -> ARIS_OUTPUT/<task>/.lock ; otherwise checkout-wide.
+if [ "${AGENT_LOCK_SCOPE:-checkout}" = "task" ] && [ -n "${TASK:-}" ]; then
+  LOCK="${AGENT_LOCK:-$ROOT/ARIS_OUTPUT/$TASK/.lock}"
+  mkdir -p "$(dirname "$LOCK")"
+else
+  LOCK="${AGENT_LOCK:-$ROOT/.agent-lock}"
+fi
 STALE_MIN="${STALE_MIN:-120}"
 HOST="$(hostname 2>/dev/null || echo unknown-host)"
 
@@ -69,31 +76,31 @@ acquire() {
     pid=$(field pid); host=$(field host); who=$(field agent); when=$(field since)
 
     if [ -z "$pid" ] || [ -z "$host" ]; then
-      echo "BLOCKED: $LOCK exists but is not parseable (no pid=/host= line)." >&2
+      echo "BLOCKED (WA-C.1): $LOCK exists but is not parseable (no pid=/host= line)." >&2
       echo "  An unreadable lock is treated as HELD, never as absent. Inspect it, then:" >&2
       echo "  bash agreements/checks/no_concurrent_writer.sh --release" >&2
       return 1
     fi
     if [ "$host" != "$HOST" ]; then
-      echo "BLOCKED: lock held by $who on host '$host' since $when." >&2
+      echo "BLOCKED (WA-C.1): lock held by $who on host '$host' since $when." >&2
       echo "  This host is '$HOST'. A pid from another machine cannot be tested here," >&2
-      echo "  so liveness is UNKNOWN, not dead. Check that session, then release it there." >&2
+      echo "  so liveness is UNKNOWN, not dead (WA-C.3). Check that session, then release it there." >&2
       return 1
     fi
     if alive "$pid"; then
-      echo "BLOCKED: tree held by live pid $pid ($who) on $host since $when" >&2
+      echo "BLOCKED (WA-C.1): tree held by live pid $pid ($who) on $host since $when" >&2
       return 1
     fi
     # A lock whose writer could not identify its own session process is never judged
     # dead by liveness - the pid it holds was never the session's. Only STALE_MIN frees it.
     if [ "$(field pid_kind)" = unverified ]; then
-      echo "BLOCKED: lock from $who ($when) records an UNVERIFIED pid ($pid)." >&2
+      echo "BLOCKED (WA-C.1): lock from $who ($when) records an UNVERIFIED pid ($pid)." >&2
       echo "  That pid was the hook's shell, not a session, so 'not alive' proves nothing." >&2
       echo "  Confirm no session is running here, then: $0 --release" >&2
       return 1
     fi
     if [ -z "$(find "$LOCK" -mmin +"$STALE_MIN" 2>/dev/null)" ]; then
-      echo "BLOCKED: lock from pid $pid ($who) is not alive but is recent (<${STALE_MIN}m)." >&2
+      echo "BLOCKED (WA-C.1): lock from pid $pid ($who) is not alive but is recent (<${STALE_MIN}m)." >&2
       echo "  Confirm no session is running, then: bash agreements/checks/no_concurrent_writer.sh --release" >&2
       return 1
     fi

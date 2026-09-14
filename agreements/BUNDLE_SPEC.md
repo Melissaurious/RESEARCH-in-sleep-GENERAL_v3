@@ -166,3 +166,13 @@ field that starts `PENDING`:
 `human_input_audit: DONE` is required before a number is promoted to a paper or thesis
 claim, and for nothing else. Recognising the inputs is not automatable; **blocking the
 pipeline on it is not what makes it valuable.**
+
+---
+
+BS-16 A bundle must survive a fresh clone. Everything a rerun needs is inside the
+bundle, tracked, and reachable from a checkout that has never seen the working tree it was
+built in. A path that resolves only on the machine that produced it is not provenance.
+`OUTPUTS.tsv` never seals `__pycache__` — a compiled artefact is not a result, and sealing
+it makes a bundle fail its own hash check the moment a rerun regenerates it.
+- check: `checks/clone_safe.sh`
+- validated: 2026-09-10 — ported from the live v6 layer, where it was earned
