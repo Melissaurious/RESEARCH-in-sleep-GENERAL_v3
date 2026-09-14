@@ -169,16 +169,19 @@ validate() {
   # v7: the research contract is the ONE claim authority. Resolving against launchers or a
   # root CLAIMS.md kept a second claim architecture alive mechanically while the prose said
   # otherwise -- two authorities that disagree within a week.
+  # ROOT is resolved FIRST. An earlier form read it here and assigned it seven lines later,
+  # so under `set -u` the check died on an unbound variable before it validated anything --
+  # found by the first real gate, which had to pass ROOT= by hand to get past it.
+  ROOT="$(git -C "$B" rev-parse --show-toplevel 2>/dev/null || true)"
   ledger="${CLAIMS_MD:-}"
-  if [ -z "$ledger" ] && [ -n "$ROOT" ] && [ -f "$ROOT/idea-stage/docs/research_contract.md" ]; then
+  if [ -z "$ledger" ] && [ -n "${ROOT:-}" ] && [ -f "$ROOT/idea-stage/docs/research_contract.md" ]; then
     ledger="$ROOT/idea-stage/docs/research_contract.md"
   fi
   _legacy_ledger=0
   LEDGER_TMP=""
   LEDGER_NAME=""
   if [ -z "$ledger" ]; then
-    ROOT="$(git -C "$B" rev-parse --show-toplevel 2>/dev/null)"
-    if [ "$_legacy_ledger" = 1 ] && [ -n "$ROOT" ] && ls "$ROOT"/launchers/*.md >/dev/null 2>&1; then
+    if [ "$_legacy_ledger" = 1 ] && [ -n "${ROOT:-}" ] && ls "$ROOT"/launchers/*.md >/dev/null 2>&1; then
       LEDGER_TMP="$(mktemp)"
       cat "$ROOT"/launchers/*.md > "$LEDGER_TMP"
       ledger="$LEDGER_TMP"
