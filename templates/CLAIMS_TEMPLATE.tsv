@@ -1,0 +1,2 @@
+claim	value	unit_denominator	scope	circularity	independence	falsifier	status
+[one sentence, scoped to what was examined]	[exact number]	[of what, over how many]	[what was audited]	[NONE|LOW|MEDIUM|HIGH]	[which methods agree + computed independence]	[what result would refute this]	[SUPPORTED|REFUTED|UNDECIDED|SUPERSEDED]

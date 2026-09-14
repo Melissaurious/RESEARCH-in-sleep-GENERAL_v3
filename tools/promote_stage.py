@@ -28,8 +28,11 @@ import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 
-PROMOTE = ["README.md", "REPORT.md", "REPORT.html", "REPRODUCE.sh", "scripts", "figures", "tables"]
-REQUIRED = ["README.md", "REPORT.md", "REPRODUCE.sh", "scripts"]
+PROMOTE = ["README.md", "REPORT.md", "REPORT.html", "CLAIMS.tsv", "REPRODUCE.sh",
+           "scripts", "figures", "tables"]
+# REPORT.html is deliberately absent: markdown is the deliverable, HTML is opt-in
+# per launcher (specs/REPORTING_STANDARDS.md).
+REQUIRED = ["README.md", "REPORT.md", "CLAIMS.tsv", "REPRODUCE.sh", "scripts"]
 FILE_CAP, STAGE_CAP = 5 * 1024**2, 50 * 1024**2
 FIGURE_EXT = {".png", ".svg", ".eps", ".pdf"}
 OK_VERDICTS = ("PASS", "PASS_WITH_CONCERNS")
@@ -147,7 +150,10 @@ def rerun(tmp: Path) -> tuple[bool, str]:
     script = tmp / "REPRODUCE.sh"
     if not script.is_file():
         return False, "no REPRODUCE.sh"
-    r = subprocess.run(["bash", str(script)], cwd=tmp, capture_output=True, text=True)
+    # --quick: regenerate tables and figures from cached intermediates. The expensive
+    # --full path cannot run at a gate, and does not need to -- what is being tested is
+    # that nothing depends on where the files happened to sit.
+    r = subprocess.run(["bash", str(script), "--quick"], cwd=tmp, capture_output=True, text=True)
     tail = (r.stdout + r.stderr)[-1500:]
     return r.returncode == 0, f"exit {r.returncode}\n{tail}"
 

@@ -19,14 +19,18 @@ _Model line as of 2026-09-14. ⚠️ Verify against `/model` before trusting thi
 the field most likely to go stale, and the previous version pinned models that no longer
 exist (`claude-sonnet-4-6`, `claude-opus-4-8`)._
 
-| Use | Model | ID |
-|---|---|---|
-| Planning, stage design, adversarial work | Opus 5 | `claude-opus-5` |
-| Routine execution | Sonnet 5 | `claude-sonnet-5` |
-| Cheap mechanical passes | Haiku 4.5 | `claude-haiku-4-5-20251001` |
+**Default: Opus 5 (1M context), High effort.** Confirmed from `/model` on borg,
+2026-09-14. Do not drop below this for planning, stage design, or any adversarial work.
 
-- Reasoning effort (if this build supports it — check `/model` or `/config`):
-  planning → high · routine execution → medium · mechanical edits → low
+| Use | `/model` entry | Notes |
+|---|---|---|
+| **Default — everything, unless stated** | **Opus (1M context)** | Opus 5, High effort |
+| Hardest / longest-running stages | Fable | Fable 5.1 |
+| Routine, cheap, mechanical | Sonnet / Haiku | only when the launcher says so |
+
+Effort stays **High** by default. Lowering it is a decision to record in `PLAN.md`, not a
+convenience — a stage planned at low effort is a stage planned badly, and the cost of a
+bad plan is measured in GPU-hours, not tokens.
 - Launch with: `--dangerously-skip-permissions`
 - Before launch: `export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000`
 
@@ -40,6 +44,18 @@ evidence only if they can disagree.*
 # invocation used by tools/adversary.py — one line, edit here and nowhere else
 export RSG_REVIEW_CMD="codex exec --skip-git-repo-check -"
 ```
+
+**Verified on borg, 2026-09-14** — `codex exec` v0.151.0 returned `OK` to the probe:
+
+| property | observed | why it matters |
+|---|---|---|
+| model | `gpt-5.6-sol` (openai) | ⭐ **a different provider entirely.** The reviewer shares no training, no priors and no failure modes with the author. `EVIDENCE_STANDARDS` §4: two methods agreeing is evidence only if they can disagree. |
+| reasoning effort | `xhigh` | the gate is the wrong place to economise |
+| sandbox | `read-only` | ⭐ **the reviewer physically cannot edit what it reviews.** Keep it this way — a reviewer that can "just fix it" stops being a reviewer. |
+| approval | `never` | runs unattended, as a gate must |
+
+If the model ever changes, record it here. A reviewer silently swapped to the author's own
+family is a gate that has quietly stopped being one.
 
 - Driver: `tools/adversary.py` — assembles the packet, calls the reviewer, writes the
   verdict into `ARIS_OUTPUT/<STAGE_ID>/review-stage/`.

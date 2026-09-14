@@ -53,16 +53,22 @@ On completion: append to `<stage>/FINDINGS.md` — what was done, what was found
 surprised you, what you'd do differently. Append only; never rewrite history.
 
 ## Output layout — two directories, two jobs
-**Workshop** — `ARIS_OUTPUT/<STAGE_ID>/`: PLAN.md, STATUS.md, FINDINGS.md, plus `scripts/`,
-`figures/`, `tables/`, `cache/`, `review-stage/`. Scratch, dead ends and failed attempts
-belong here and are never tidied away — the mess is the audit trail. Gitignored.
+**Workshop** — `ARIS_OUTPUT/<STAGE_ID>/`: PLAN.md, FINDINGS.md, CLAIMS.tsv, REPORT.md,
+STATUS.md, plus `scripts/`, `figures/`, `tables/`, `cache/`, `review-stage/`. Scratch,
+dead ends and failed attempts belong here and are never tidied away — the mess is the
+audit trail. Gitignored.
 
-**Shipped** — `results/<STAGE_ID>/`, same subfolder name: README.md, PROVENANCE.md,
-MANIFEST.tsv, REPRODUCE.sh, `scripts/`, `figures/`, `tables/`, REPORT.md + REPORT.html.
+**Shipped** — `results/<STAGE_ID>/`, same subfolder name: README.md, REPORT.md,
+CLAIMS.tsv, REPRODUCE.sh, PROVENANCE.md, MANIFEST.tsv, `scripts/`, `figures/`, `tables/`.
 A clean documented copy that reruns from a fresh checkout. Committed manually, at the end.
 
-STATUS.md is overwritten; FINDINGS.md is appended, never rewritten. One outdir per stage.
-Never invent a different structure or a parallel top-level output dir.
+Four reporting artefacts, four jobs — never merged (`specs/REPORTING_STANDARDS.md`):
+`FINDINGS.md` the journal, written **during** and appended, never rewritten · `CLAIMS.tsv`
+the ledger, one row per claim with its circularity and falsifier · `REPORT.md` the
+deliverable, assembled at the end · `STATUS.md` machine state, overwritten, written last.
+**Markdown is the deliverable; `REPORT.html` only when the launcher asks for it.**
+
+One outdir per stage. Never invent a different structure or a parallel top-level output dir.
 → `specs/PROMOTION_STANDARDS.md`
 
 ## Launchers
