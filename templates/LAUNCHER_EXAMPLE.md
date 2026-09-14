@@ -49,13 +49,15 @@ wins and the disagreement is the finding.
 
 ## 6. Claims this task tests
 
-| id | claim (short, for the reader — **authority is the contract**) |
+| id | role in this task |
 |---|---|
-| C1 | ≥500 records carry both an RT call and an ncRNA call |
-| C2 | Records carrying exactly one of the two are a minority of the corpus |
+| C1 | primary |
+| C2 | primary |
 
-Status and full wording live in `<project>/idea-stage/docs/research_contract.md`. This table is a
-reference so the launcher reads on its own; it is not a second ledger.
+⛔ **Ids and roles only — never a paraphrase.** The wording and status live in
+`<project>/idea-stage/docs/research_contract.md`, which ARIS creates and consumes. A
+restated claim drifts from the canonical one within a week, and then two sentences both
+claim to be C1. `REFUTED` is a result, not a failure.
 
 ## 7. Gates
 

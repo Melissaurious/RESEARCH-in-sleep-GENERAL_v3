@@ -40,6 +40,8 @@ speaks SLURM.
 | `skills/plan-audit/` | audits a plan's **science** before compute — additional to ARIS's review, never a replacement |
 | `skills/experiment-routing-ibex/` | forces Ibex milestones to `/run-experiment-ibex`; `/experiment-queue` must never touch the cluster |
 | `tools/check_launcher.py` | refuses a launcher that cannot run unattended |
+| `tools/pin_aris.sh` | pins the ARIS revision a project runs against — `ARIS.lock` |
+| `tools/install_ibex_overlay.sh` | **derives** a same-name override of `experiment-bridge` from the pinned ARIS so Ibex routing is binding, not descriptive. Fails closed if ARIS has drifted off the pin. |
 | `tools/bundle.sh` · `index.sh` · `dispatch.py` · `cache.py` | bundle assembly, rollup, machine choice, caching |
 
 ## Checks

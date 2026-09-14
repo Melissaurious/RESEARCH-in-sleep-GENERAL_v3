@@ -83,11 +83,21 @@ say "initial commit"
 echo
 if bash general/checks/specs_exist.sh; then
   echo
+  say "⚠ NOT YET IBEX-ROUTED. The overlay below is required before an unattended cluster run."
+  echo
   say "GOVERNED. Next, in this order:"
   say "  1. CLAUDE.md            — subject, environment, paths, budget   (~60 lines)"
   say "  2. idea-stage/docs/research_contract.md — the standing science: question,"
   say "                            datasets, baselines, kill criteria     (~60 lines)"
   say "  3. launchers/LAUNCHER_<track>.md — the task now; see LAUNCHER_EXAMPLE.md (~100)"
+  say ""
+  say "THEN, before any unattended run — Ibex routing is not binding until you do this:"
+  say "  bash general/tools/pin_aris.sh [~/aris_repo]      # pin the ARIS revision"
+  say "  bash general/tools/install_ibex_overlay.sh        # derive the routing override"
+  say ""
+  say "Without the overlay, /experiment-bridge still routes >=10 jobs to /experiment-queue,"
+  say "which screens onto a login node instead of using SLURM. A sibling skill cannot"
+  say "intercept that; only a skill at the SAME NAME can."
   say ""
   say "Those three are everything you write by hand, ever. INDEX.md is GENERATED"
   say "(bash general/tools/index.sh) and never hand-edited."

@@ -45,14 +45,14 @@ run; 21.4 GB of embeddings existed and were computed on unoriented sequence. Bot
 
 ## 6. Claims this task tests
 
-| id | claim (short, for the reader — **authority is the contract**) |
+| id | role in this task |
 |---|---|
-| `C1` | `[one-line reminder of what C1 says]` |
+| `C1` | `[primary | supporting]` |
 
-⛔ **This is a reference, not a ledger.** The claims and their status live in
-`<project>/idea-stage/docs/research_contract.md`, which ARIS creates and consumes. A launcher that
-restates them creates a second authority, and two claim ledgers disagree within a week.
-`REFUTED` is a result, not a failure.
+⛔ **Ids and roles only — never a paraphrase.** The wording and status live in
+`<project>/idea-stage/docs/research_contract.md`, which ARIS creates and consumes. A
+restated claim drifts from the canonical one within a week, and then two sentences both
+claim to be C1. `REFUTED` is a result, not a failure.
 
 ## 7. Gates
 
@@ -73,8 +73,8 @@ Required the moment a number becomes a claim (WA-B.3). Start LIGHT unless it is 
 
 ## 9. Autonomy envelope
 
-**Auto-proceed:** `[true]` — ARIS's `AUTO_PROCEED` defaults to **false**; set it here
-deliberately or the loop stops at every gate waiting for someone who is asleep.
+**Auto-proceed:** `true` — this **is** `/research-pipeline`'s default, stated here
+explicitly because this track is meant to run unattended.
 
 **Compute budget** — the envelope replaces time-based approval. Inside it, do not ask:
 

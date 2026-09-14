@@ -37,26 +37,28 @@ threshold to get a pass.
 - validated: 2026-09-14 — a previous layer replaced the canonical reviewer wholesale, and a
   still earlier one defaulted the adversary to the author's own model family.
 
-**WA-D.1** [ALWAYS] **Containment, enforced mechanically — not by intention.** Source data
-and original scripts are read-only by file mode (`chmod a-w`). A track writes to exactly one
-directory, enforced by `sandbox.filesystem.allowWrite` in `.claude/settings.json`; everything
-else on the machine is read-only to it.
-- check: `manual` — `find <data> -writable` empty; `Bash(chmod:*)` denied in settings
-- validated: 2026-09-04 — prose for months, and violated; now a file mode
-
-**WA-G.5** [ALWAYS] It is a result and lands like any other.
-*Verified* means reproducible, not welcome. What is withheld is broken intermediate work,
-never an unwelcome finding.
+**WA-D.1** [ALWAYS] **Containment, enforced mechanically — not by intention.** Source and
+canonical inputs are read-only by file mode (`chmod a-w`). Writes are confined to the
+project paths declared in `.claude/settings.json` — ARIS's artifact directories and this
+layer's — and `permissions.allow` mirrors `sandbox.filesystem.allowWrite`, so a path the
+sandbox permits never stalls on a prompt.
+- check: `manual` — `find <data> -writable` empty; the two allowlists mirror each other
+- validated: 2026-09-14 — an earlier form said "exactly one directory", which was false the
+  moment ARIS's artifact paths were unblocked, and a rule contradicted by its own settings
+  teaches an agent to ignore it
+**WA-G.5** [ALWAYS] **Null and refuting results are never suppressed.** *Verified* means
+reproducible, not welcome. What is withheld is broken intermediate work — never an
+unwelcome finding.
 - check: `manual`
-- validated: 2026-09-04 — without it this suppresses the negatives EVIDENCE_STANDARDS §6 requires
-
+- validated: 2026-09-04 — without this, the rule suppresses exactly the negatives
+  `EVIDENCE_STANDARDS` §6 requires
 ---
 
 ## D — Data and measurement
 
 **WA-S.1** [ALWAYS] **Never guess silently and never stall.** Append to `docs/BLOCKED.md`: what
 is needed, why, the options, your recommended default. **LOW-STAKES** — reversible, contained,
-<10 min compute, inside the gate's scratch: take the default, log it, **continue.**
+inside the declared compute budget, inside scratch: take the default, log it, **continue.**
 **HIGH-STAKES** — deleting or overwriting, large compute, changing a spec, publishing: stop.
 - check: `manual`
 - validated: 2026-08-31 — used correctly on a conflict over a sealed register

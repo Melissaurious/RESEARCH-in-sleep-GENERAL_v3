@@ -56,7 +56,7 @@ there are none — an empty conventions list is better than an invented one.>
 ## File safety
 
 - Source data is read-only, enforced by file mode (WA-D.1).
-- This track writes to exactly one directory (WA-D.1) — see the active launcher §0.1, and
+- Writes are confined to the paths declared in `.claude/settings.json` (WA-D.1) — and
   `.claude/settings.json`.
 - All scratch goes to `ARIS_OUTPUT/` — gitignored, disposable, allowed to be messy.
 - Numbers go to `results/<GATE>/` and nowhere else (WA-B.1).

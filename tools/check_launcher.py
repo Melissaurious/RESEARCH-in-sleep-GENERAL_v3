@@ -67,6 +67,19 @@ def table_rows(text: str, after: str) -> list[str]:
     return rows
 
 
+def _contract_ids(launcher: Path) -> set[str] | None:
+    """Claim ids declared in the project's research contract, or None if it is not found.
+
+    Returning None rather than an empty set matters: 'no contract here' is a different
+    state from 'a contract that declares nothing', and only the second is a launcher error.
+    """
+    for base in (launcher.parent.parent, launcher.parent, Path.cwd()):
+        c = base / "idea-stage" / "docs" / "research_contract.md"
+        if c.is_file():
+            return set(re.findall(r"\bC\d+\b", c.read_text(encoding="utf-8")))
+    return None
+
+
 def check(path: Path) -> list[str]:
     """Every launcher check. Empty list means it can run unattended."""
     problems: list[str] = []
@@ -96,8 +109,14 @@ def check(path: Path) -> list[str]:
                 f"                   must be 'results/<gate>/ exists and run.sh reproduces "
                 f"the number' (WA-G.2)")
 
+    contract = _contract_ids(path)
     claims = table_rows(text, "claims")
     for row in claims:
+        for cid in re.findall(r"\bC\d+\b", row):
+            if contract is not None and cid not in contract:
+                problems.append(
+                    f"UNKNOWN CLAIM    {cid} is not in idea-stage/docs/research_contract.md\n"
+                    f"                   (it declares: {', '.join(sorted(contract)) or 'none'})")
         if not re.search(r"\bC\d+\b", row):
             problems.append(
                 f"CLAIM HAS NO ID  {row[:64]}\n"

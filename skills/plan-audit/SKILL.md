@@ -6,7 +6,7 @@ description: Audit an experimental plan for scientific validity BEFORE any compu
 # Plan audit — scientific validity, before the compute
 
 **This is NOT a lifecycle gate and does not replace ARIS's review.** ARIS owns reviewer
-routing, the score threshold and the stop/continue/escalate transition
+routing and the stop/continue/escalate transition **for its own review machinery**
 (ARIS's `review_gate.py`: positive requires `score >= 6` and verdict in `{ready, almost}`),
 and `/experiment-bridge` already does a pre-deployment **code** review where CRITICAL
 issues force revision.
@@ -73,6 +73,10 @@ NOT CHECKED: <what could not be verified from this packet, and why>
 
 ⚠️ **A plan does not pass on the top-level verdict alone.** It passes when
 `score >= 6` **AND** `verdict ∈ {ready, almost}` **AND** *no finding is marked `BLOCKING`*.
+
+The third condition is **this skill's own, added on top of** ARIS's threshold — ARIS's
+`review_gate.py` decides on score and verdict, and does not evaluate blocking findings
+separately. That is a deliberate addition here, not a restatement of ARIS's rule.
 
 That third condition is not pedantry. An earlier version of this check gated on the verdict
 only, so a reply reading `VERDICT: almost` with a `[BLOCKING]` finding underneath opened the
