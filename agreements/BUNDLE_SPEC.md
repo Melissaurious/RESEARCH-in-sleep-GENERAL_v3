@@ -65,7 +65,7 @@ BS-10 `PROVENANCE.md` carries `agreements: <sha>` — the revision of the workin
       agreements this run was governed by. Without it, "we followed our
       standards" is unfalsifiable once the standards change.
 BS-12 Every claim id whose status the README proposes must ALREADY be a row in
-      the claims table in `idea-stage/docs/research_contract.md`. A gate that discovers a new claim mid-flight
+      the claims table in `<project>/idea-stage/docs/research_contract.md`. A gate that discovers a new claim mid-flight
       describes it in PROSE; the operator assigns the number.
       WA-L.1 says the claim exists as UNPROVEN before the gate runs, and WA-L.1 says the
       ledger is the operator's. A gate that hands itself an id breaks both - and the

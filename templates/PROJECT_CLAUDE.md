@@ -25,7 +25,7 @@ Moving the pin is a deliberate commit with a decision record in `docs/decisions/
 
 ## Read before acting
 
-- `idea-stage/docs/research_contract.md` — **the single claim authority.** The question,
+- `<project>/idea-stage/docs/research_contract.md` — **the single claim authority.** The question,
   the claims and their status. ARIS creates and consumes this path.
   ⛔ There is no `GOALS.md`, no `CLAIMS.md`, no `ROADMAP.md`. A launcher *references* claims
   ("this task tests C2 and C4"); it never restates them. Three claim ledgers disagree

@@ -23,7 +23,7 @@ design would waste real hours.
 
 ## What the reviewer gets — and does not
 
-**Give:** `EXPERIMENT_PLAN.md`, the launcher, `idea-stage/docs/research_contract.md`, real
+**Give:** `EXPERIMENT_PLAN.md`, the launcher, `<project>/idea-stage/docs/research_contract.md`, real
 schema probes of the inputs, and `general/agreements/EVIDENCE_STANDARDS.md`.
 
 ⛔ **Withhold:** the conversation, the author's justifications, its confidence, and any

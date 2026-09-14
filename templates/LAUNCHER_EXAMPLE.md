@@ -54,7 +54,7 @@ wins and the disagreement is the finding.
 | C1 | ≥500 records carry both an RT call and an ncRNA call |
 | C2 | Records carrying exactly one of the two are a minority of the corpus |
 
-Status and full wording live in `idea-stage/docs/research_contract.md`. This table is a
+Status and full wording live in `<project>/idea-stage/docs/research_contract.md`. This table is a
 reference so the launcher reads on its own; it is not a second ledger.
 
 ## 7. Gates

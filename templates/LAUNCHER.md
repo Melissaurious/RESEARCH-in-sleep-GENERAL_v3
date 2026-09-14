@@ -50,7 +50,7 @@ run; 21.4 GB of embeddings existed and were computed on unoriented sequence. Bot
 | `C1` | `[one-line reminder of what C1 says]` |
 
 ⛔ **This is a reference, not a ledger.** The claims and their status live in
-`idea-stage/docs/research_contract.md`, which ARIS creates and consumes. A launcher that
+`<project>/idea-stage/docs/research_contract.md`, which ARIS creates and consumes. A launcher that
 restates them creates a second authority, and two claim ledgers disagree within a week.
 `REFUTED` is a result, not a failure.
 
