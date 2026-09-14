@@ -126,5 +126,5 @@ prompts a check. Each of these was paid for once; the numbers are what make them
 - ⚠️ Local InterProScan/Pfam is a **stub** — Pfam-A holds 3–4 profiles, TIGRFAM 1. A clean run
   against it is `DATA_INADEQUATE`, **not a negative**. Full Pfam-A 37.0 (21,979 models) is
   registered on Ibex.
-- ⛔ **`VOID_DO_NOT_CITE.md` has not been consulted.** `RETRON_STAGES/00_INDEX.md` says to check
+- ⛔ **`VOID_DO_NOT_CITE.md` has not been consulted.** `idea-stage/programme/00_INDEX.md` says to check
   it before quoting any prior figure. **Locate it before any prior number is cited.**
