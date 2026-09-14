@@ -7,25 +7,21 @@ project consumes this as a submodule at `general/` and pins it by sha.
 > are superseded and named once, in `LINEAGE.md`. Prior work is *reusable* — after a smoke
 > test that grades it by execution, never because it looks finished.
 
-## The shape of work — one human stop, at the start
+## ARIS owns the workflow. This layer constrains how it works.
 
-```
-launchers/<track>.md   ← the operator writes this ONCE, then sleeps
-        ↓
-   PLAN.md   →  review.sh --plan     → an independent model's verdict GATES execution
-        ↓
-   execute   →  review.sh --result   → its verdict GATES landing
-        ↓
-   results/<GATE>/  lands
-        ↓
-   the operator reads it in the morning    ← asynchronous, never blocking
-```
+**ARIS owns** the lifecycle — idea → contract → experiment plan → implementation →
+execution → review → claims → paper — with its artifacts, its loops and round budgets, and
+its reviewer routing (ARIS's `review_gate.py`). **This layer owns** data safety, evidence
+standards, provenance, reporting quality, Ibex execution policy, and which decisions are
+reserved for the operator.
 
 **Why v7 exists.** v6 was rigorous and required the operator at four points inside every
-single measurement: approving the plan, recognising the inputs, granting risk acceptance, and
-interpreting. Each was defensible. Together they meant nothing could complete unattended —
-**twelve projects, 75 scratch directories, 15 launchers, 19 retros, and zero landed results.**
-v7 keeps the rigor and moves the gate onto an independent reviewer.
+measurement. Twelve projects, 75 scratch directories, 19 retros, **zero landed results.**
+v7 keeps the rigor and hands the loop back to ARIS.
+
+**The one place it intervenes in execution is Ibex**, because ARIS's `/run-experiment` and
+`/experiment-queue` speak to local, vast and modal hosts over SSH + `screen`, and neither
+speaks SLURM.
 
 ## Layout
 
@@ -40,9 +36,9 @@ v7 keeps the rigor and moves the gate onto an independent reviewer.
 | `site/` | this installation: `COMPUTE.md`, `IBEX.md`, `TOOLING.md` |
 | `checks/` | the runnable half of the rules — every one ships a `SELFTEST=1` target |
 | `templates/LAUNCHER.md` · `LAUNCHER_EXAMPLE.md` | the scaffold, and a filled one that passes |
-| `templates/GATE_WORKFLOW.md` | running one gate, unattended |
 | `skills/run-experiment-ibex/` | SLURM skill for Ibex — **overrides ARIS's generic `run-experiment`**, which uses SSH + screen |
-| `tools/review.sh` | **the gate.** An independent model reviews the plan and the result. |
+| `skills/plan-audit/` | audits a plan's **science** before compute — additional to ARIS's review, never a replacement |
+| `skills/experiment-routing-ibex/` | forces Ibex milestones to `/run-experiment-ibex`; `/experiment-queue` must never touch the cluster |
 | `tools/check_launcher.py` | refuses a launcher that cannot run unattended |
 | `tools/bundle.sh` · `index.sh` · `dispatch.py` · `cache.py` | bundle assembly, rollup, machine choice, caching |
 

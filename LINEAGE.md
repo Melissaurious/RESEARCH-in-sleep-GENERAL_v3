@@ -56,7 +56,7 @@ unlinked, because every skill description is loaded into every session
 - **Separate `ROADMAP.md` and `CLAIMS.md`** — they contradicted the rule that the launcher is
   the only operator document.
 - **`adversary.sh`** — depended on a script that did not exist, so the adversarial pass had
-  never once run. Replaced by `tools/review.sh`, which depends on nothing outside this layer.
+  never once run. **Its replacement, `tools/review.sh`, is also now removed** — it gated on the top-level verdict and let a `[BLOCKER]` finding through, and ARIS's `review_gate.py` already owned that transition. The plan-stage audit it was really for survives as `skills/plan-audit/`.
 - **The retroactive correction apparatus** that grew to sixteen registers in `RETRON-DB_V4`.
   All of it is downstream of having no gate at production time. With a gate it is unnecessary.
 - **43 of v6's 61 rules** — 18 never validated against a real case, the rest folded or cut.

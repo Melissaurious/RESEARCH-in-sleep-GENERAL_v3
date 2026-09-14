@@ -47,12 +47,15 @@ schema correction above, and nothing records whether they were computed before o
 If they agree with a fresh count, say so and cite both. If they disagree, the fresh count
 wins and the disagreement is the finding.
 
-## 6. Claims this track settles
+## 6. Claims this task tests
 
-| id | claim | status |
-|---|---|---|
-| C1 | The corpus contains ≥500 records carrying both an RT call and an ncRNA call | UNPROVEN |
-| C2 | Records carrying exactly one of the two calls are a minority of the corpus | UNPROVEN |
+| id | claim (short, for the reader — **authority is the contract**) |
+|---|---|
+| C1 | ≥500 records carry both an RT call and an ncRNA call |
+| C2 | Records carrying exactly one of the two are a minority of the corpus |
+
+Status and full wording live in `idea-stage/docs/research_contract.md`. This table is a
+reference so the launcher reads on its own; it is not a second ledger.
 
 ## 7. Gates
 

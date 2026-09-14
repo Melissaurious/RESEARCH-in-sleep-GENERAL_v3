@@ -19,6 +19,7 @@ LAYER_URL="${2:-$LAYER_DIR}"
 say() { printf '  %s\n' "$*"; }
 
 mkdir -p "$DEST"/{launchers,results,retros,docs/decisions,data,sidework,ARIS_OUTPUT,.claude}
+mkdir -p "$DEST"/idea-stage/docs   # ARIS's canonical home for the research contract
 cd "$DEST"
 # -b main explicitly: the whole workflow branches gates from origin/main, and a repo whose
 # default branch is master silently has no such ref. Fallback for git < 2.28.
@@ -31,7 +32,7 @@ git -c protocol.file.allow=always submodule add -q "$LAYER_URL" general 2>/dev/n
 say "layer mounted at general/ ($(git -C general rev-parse --short HEAD))"
 
 cp general/templates/PROJECT_CLAUDE.md     CLAUDE.md
-cp general/templates/RESEARCH_CONTRACT.md  research_contract.md
+cp general/templates/RESEARCH_CONTRACT.md  idea-stage/docs/research_contract.md
 cp general/templates/LAUNCHER.md           launchers/LAUNCHER_TEMPLATE.md
 cp general/templates/LAUNCHER_EXAMPLE.md   launchers/LAUNCHER_EXAMPLE.md
 # __SCRATCH__ is a placeholder in the templates; substitute the project's scratch dir name.
@@ -52,8 +53,10 @@ printf '# SIDEWORK\n\nNothing here is a number. No bundle, no acceptance. A find
 # SSH + screen -- no allocation, no job id, dies with the connection. Symlinked into the
 # submodule so it moves with the pin.
 mkdir -p .claude/skills
-ln -sfn ../../general/skills/run-experiment-ibex .claude/skills/run-experiment-ibex
-say "templates copied; run-experiment-ibex skill linked"
+for s in run-experiment-ibex experiment-routing-ibex plan-audit; do
+  ln -sfn "../../general/skills/$s" ".claude/skills/$s"
+done
+say "templates copied; 3 skills linked (routing override + Ibex executor + plan audit)"
 
 # README must list every agreements/ and site/ spec, or specs_exist.sh fails (by design).
 {
@@ -62,7 +65,7 @@ say "templates copied; run-experiment-ibex skill linked"
   printf '## Layout\n\n'
   printf '| path | what it is |\n|---|---|\n'
   printf '| `CLAUDE.md` | project context; points at `general/` for every rule |\n'
-  printf '| `research_contract.md` | the standing science: question, claims, datasets, baselines. Written by hand. |\n'
+  printf '| `idea-stage/docs/research_contract.md` | the standing science and the ONE claim authority. Written by hand. |\n'
   printf '| `launchers/` | one per track — objective, kill criteria, inputs, gates. Written by hand. |\n'
   printf '| `INDEX.md` | GENERATED rollup of claims and bundles (`bash general/tools/index.sh`). Never hand-edited. |\n'
   printf '| `results/` | bundles, and nothing else |\n'
@@ -82,7 +85,7 @@ if bash general/checks/specs_exist.sh; then
   echo
   say "GOVERNED. Next, in this order:"
   say "  1. CLAUDE.md            — subject, environment, paths, budget   (~60 lines)"
-  say "  2. research_contract.md — the standing science: question, claims,"
+  say "  2. idea-stage/docs/research_contract.md — the standing science: question,"
   say "                            datasets, baselines, kill criteria     (~60 lines)"
   say "  3. launchers/LAUNCHER_<track>.md — the task now; see LAUNCHER_EXAMPLE.md (~100)"
   say ""

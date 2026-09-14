@@ -25,9 +25,11 @@ Moving the pin is a deliberate commit with a decision record in `docs/decisions/
 
 ## Read before acting
 
-- `GOALS.md` — what we are trying to be able to claim
-- `CLAIMS.md` — the falsifiable statements and their status. The progress tracker.
-- `ROADMAP.md` — the gates; exactly one is active
+- `idea-stage/docs/research_contract.md` — **the single claim authority.** The question,
+  the claims and their status. ARIS creates and consumes this path.
+  ⛔ There is no `GOALS.md`, no `CLAIMS.md`, no `ROADMAP.md`. A launcher *references* claims
+  ("this task tests C2 and C4"); it never restates them. Three claim ledgers disagree
+  within a week.
 - `launchers/LAUNCHER_<track>.md` — the active track. The authority on scope (WA-L.1).
 - `docs/decisions/` — settled decisions, numbered. Not re-argued in a session; superseded
   by a new record or not at all.
@@ -77,7 +79,7 @@ skills consume them, and an empty one is read as "not set", not as "not applicab
 | Research direction | `[the problem statement, one paragraph]` |
 | Current stage | `[idea-discovery \| contract \| experiment-plan \| running \| review \| narrative \| paper]` |
 | Target venue | `[journal or conference, or "thesis chapter N"]` |
-| `AUTO_PROCEED` | `[true]` — **ARIS defaults to false.** Set it deliberately, or every loop stops at a gate waiting for someone who is asleep. |
+| `AUTO_PROCEED` | `true` — this **is** `/research-pipeline`'s default; stated here explicitly because this project is meant to run unattended. When true, every selection checkpoint is informational: report the choice and continue. |
 | Executor / reviewer | `[Opus 5 High]` / `[codex gpt-5.6-sol]` — `claude_profile.json` |
 | Compute budget | see `launchers/LAUNCHER_<track>.md` §9 |
 | Effort levels | `[skill:effort pairs, if you override defaults]` |

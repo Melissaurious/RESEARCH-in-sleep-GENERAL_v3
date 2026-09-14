@@ -98,12 +98,14 @@ def check(path: Path) -> list[str]:
 
     claims = table_rows(text, "claims")
     for row in claims:
-        if "UNPROVEN" not in row.upper():
+        if not re.search(r"\bC\d+\b", row):
             problems.append(
-                f"CLAIM NOT UNPROVEN  {row[:66]}\n"
-                f"                   every claim is born UNPROVEN, before its gate runs")
+                f"CLAIM HAS NO ID  {row[:64]}\n"
+                f"                   reference a claim id from "
+                f"idea-stage/docs/research_contract.md (e.g. C1) -- the launcher\n"
+                f"                   references claims, it does not own them (WA-L.1)")
     if not claims:
-        problems.append("NO CLAIMS        section 6 has no claim rows")
+        problems.append("NO CLAIMS        section 6 names no claim this task tests")
 
     return problems
 

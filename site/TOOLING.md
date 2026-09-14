@@ -21,38 +21,40 @@ export CLAUDE_CODE_MAX_OUTPUT_TOKENS=100000
 claude --dangerously-skip-permissions
 ```
 
-## Reviewer — codex. **A different provider, and that is the point.**
+## Reviewer — ARIS owns the routing
 
-`tools/review.sh` refuses to run when the reviewer and author share a family (WA-A.5).
+**Reviewer independence, score thresholds and the stop/continue/escalate transition belong
+to ARIS** (ARIS's `review_gate.py`, `/auto-review-loop`): positive requires `score >= 6` and
+verdict in `{ready, almost}`. This layer adds review; it never routes around it, substitutes
+a same-family reviewer, or lowers a threshold to get a pass (WA-A.5).
+
+Codex is available as an additional reviewer, and is a genuinely independent one:
 
 ```bash
-export RSG_REVIEW_CMD="codex exec --skip-git-repo-check -"
-export RSG_REVIEWER_FAMILY=openai        # author family defaults to anthropic
-export REVIEW_ROUND_BUDGET=3
+codex exec --skip-git-repo-check -
 ```
 
 **Verified on borg, 2026-09-14** — `codex exec` v0.151.0 answered the probe:
 
 | property | observed | why it matters |
 |---|---|---|
-| model | `gpt-5.6-sol` (openai) | ⭐ shares no training, priors or failure modes with the author. `EVIDENCE_STANDARDS` §4 applied to the review itself. |
-| reasoning | `xhigh` | the gate is the wrong place to economise |
-| sandbox | `read-only` | ⭐ **cannot edit what it reviews.** A reviewer that can "just fix it" stops being a reviewer. |
-| approval | `never` | runs unattended, as a gate must |
+| model | `gpt-5.6-sol` (openai) | ⭐ a different provider — shares no training, priors or failure modes with the author |
+| reasoning | `xhigh` | a review is the wrong place to economise |
+| sandbox | `read-only` | ⭐ **cannot edit what it reviews.** A reviewer that can "just fix it" stops being one. |
+| approval | `never` | runs unattended |
 
-If the model changes, record it here. A reviewer silently swapped to the author's family is a
-gate that has quietly stopped being one.
+Reaching it needs `api.openai.com` in `sandbox.network.allow` — the scaffolded
+`settings.json` has it.
 
-`review.sh` probes the reviewer **by execution** before trusting it: absent, or present and
-returning nothing, is never a pass.
 
 ## ARIS
 
 Upstream methodology at `~/aris_repo` — *auto-research-in-sleep*. Installed, not vendored
 (`LINEAGE.md`).
 
-- **`mcp-servers/codex-exec/`** — the cross-model review bridge. This is the amenity worth
-  taking; it does what `review.sh` shells out to, as an MCP server.
+- **`mcp-servers/codex-exec/`** — the cross-model review bridge, as an MCP server.
+- **ARIS's `review_gate.py`** — the deterministic stop/continue/escalate transition. This is
+  what an earlier version of this layer wrongly duplicated in a shell script.
 - **`skills/run-experiment-ibex/`** (in this layer) **overrides ARIS's generic
   `run-experiment`.** That one launches remote work over SSH + `screen`: no SLURM
   allocation, no job id to size from or account against, and it dies with the connection.

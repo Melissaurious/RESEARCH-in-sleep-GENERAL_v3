@@ -65,7 +65,7 @@ BS-10 `PROVENANCE.md` carries `agreements: <sha>` — the revision of the workin
       agreements this run was governed by. Without it, "we followed our
       standards" is unfalsifiable once the standards change.
 BS-12 Every claim id whose status the README proposes must ALREADY be a row in
-      the claims table of its track's launcher (section 3b). A gate that discovers a new claim mid-flight
+      the claims table in `idea-stage/docs/research_contract.md`. A gate that discovers a new claim mid-flight
       describes it in PROSE; the operator assigns the number.
       WA-L.1 says the claim exists as UNPROVEN before the gate runs, and WA-L.1 says the
       ledger is the operator's. A gate that hands itself an id breaks both - and the
@@ -108,7 +108,7 @@ BS-14 The README answers the six adversarial questions in writing, before the
       (name the word); what specific alternative explanation produces this exact
       number; could this test have returned a negative; the unit of every rate;
       which numbers have no producing script; what was withdrawn or weakened.
-      Full text: `agreements/LAUNCHER_SPEC.md` § The self-adversarial gate.
+      Full text: `agreements/LAUNCHER_SPEC.md`.
 
       This runs BEFORE an external reader is spent on the work. A second reader is
       expensive and should not spend its attention on what the author could have
@@ -153,5 +153,16 @@ be, or the bundle is not reproducible.
 ## Acceptance
 
 A bundle is accepted when `checks/bundle_valid.sh results/<GATE-ID>` passes and
-a human has opened INPUTS.tsv and recognised the inputs. The second half is not
-automatable and is not optional.
+a human has opened INPUTS.tsv and recognised the inputs.
+
+⚠️ **These are two different states, and conflating them put the operator back in the
+critical path.** A bundle that reruns and reproduces is `REPRODUCIBLE`, and ARIS may
+continue on it immediately — overnight, unattended. The human input audit is a separate
+field that starts `PENDING`:
+
+    bundle_status:     REPRODUCIBLE      <- machine, gates nothing downstream
+    human_input_audit: PENDING | DONE    <- morning review
+
+`human_input_audit: DONE` is required before a number is promoted to a paper or thesis
+claim, and for nothing else. Recognising the inputs is not automatable; **blocking the
+pipeline on it is not what makes it valuable.**

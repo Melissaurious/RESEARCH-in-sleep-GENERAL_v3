@@ -43,14 +43,16 @@ to look, **and say what would make them untrustworthy.**]
 ⚠️ Absence is loud; wrongness is quiet. A stage recorded as "never started" had in fact been
 run; 21.4 GB of embeddings existed and were computed on unoriented sequence. Both read as ready.
 
-## 6. Claims this track settles
+## 6. Claims this task tests
 
-| id | claim | status |
-|---|---|---|
-| `[C1]` | `[one sentence, scoped to what will actually be examined]` | `UNPROVEN` |
+| id | claim (short, for the reader — **authority is the contract**) |
+|---|---|
+| `C1` | `[one-line reminder of what C1 says]` |
 
-Every claim is born `UNPROVEN` here, before its gate runs. A claim reaches the paper only
-from `SUPPORTED` with circularity `NONE` or `LOW`. **`REFUTED` is a result, not a failure.**
+⛔ **This is a reference, not a ledger.** The claims and their status live in
+`idea-stage/docs/research_contract.md`, which ARIS creates and consumes. A launcher that
+restates them creates a second authority, and two claim ledgers disagree within a week.
+`REFUTED` is a result, not a failure.
 
 ## 7. Gates
 
