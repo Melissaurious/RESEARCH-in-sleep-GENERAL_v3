@@ -108,7 +108,7 @@ BS-14 The README answers the six adversarial questions in writing, before the
       (name the word); what specific alternative explanation produces this exact
       number; could this test have returned a negative; the unit of every rate;
       which numbers have no producing script; what was withdrawn or weakened.
-      Full text: `agreements/LAUNCHER_SPEC.md`.
+      
 
       This runs BEFORE an external reader is spent on the work. A second reader is
       expensive and should not spend its attention on what the author could have
@@ -121,7 +121,7 @@ BS-14 The README answers the six adversarial questions in writing, before the
 
 BS-15 `PROVENANCE.md` carries `models:` - the model or models that produced the
       bundle, as a list. An adversarial pass asserts its own model is DISJOINT from
-      that set (WA-A.1).
+      that set (WA-A.5).
 
       A list and disjointness, not a single value and inequality: a bundle planned
       by one model and executed by another is the normal case, and forcing a choice
@@ -152,8 +152,6 @@ be, or the bundle is not reproducible.
 
 ## Acceptance
 
-A bundle is accepted when `checks/bundle_valid.sh results/<GATE-ID>` passes and
-a human has opened INPUTS.tsv and recognised the inputs.
 
 ⚠️ **These are two different states, and conflating them put the operator back in the
 critical path.** A bundle that reruns and reproduces is `REPRODUCIBLE`, and ARIS may
@@ -176,3 +174,14 @@ built in. A path that resolves only on the machine that produced it is not prove
 it makes a bundle fail its own hash check the moment a rerun regenerates it.
 - check: `checks/clone_safe.sh`
 - validated: 2026-09-10 — ported from the live v6 layer, where it was earned
+
+BS-17 `unit` and `denominator` must SAY something. An empty field in either column fails,
+as does a bare `-` or `?`. Where an artifact genuinely carries no rate, write
+`n/a - <why>` — the same convention as `seed` (BS-9), because a stated absence is a
+decision and an empty string is an oversight, and the two must not look alike.
+- check: `checks/bundle_valid.sh`
+- validated: 2026-09-14 — *would have caught:* a production tree with 15 landed bundles at
+  100% known-producer and **0.0% denominator coverage**. Every number reproducible, none of
+  them citable, because the validator checked the field COUNT and never the field CONTENT.
+  *Would wrongly reject:* a figure or a raw sequence file that carries no rate at all —
+  which is why `n/a - <why>` is accepted rather than requiring a value.

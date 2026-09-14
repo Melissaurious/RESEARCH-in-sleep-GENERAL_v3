@@ -26,7 +26,7 @@ SCAN_DEFAULT="CLAUDE.md README.md"
 # OPTIONAL: scanned if present, silent if not. A young project has no IDEAS.md yet, and
 # this layer's own repository has no GOALS.md — neither is an error, but both must be
 # scanned once they exist, because that is where the dead references actually collect.
-SCAN_OPTIONAL="GOALS.md CLAIMS.md ROADMAP.md IDEAS.md data/README.md docs/*.md \
+SCAN_OPTIONAL="idea-stage/docs/research_contract.md IDEAS.md data/README.md docs/*.md \
 agreements/*.md site/*.md general/agreements/*.md general/site/*.md"
 PLACEHOLDER='<|>|\*|YYYY|MM-DD|ROW-ID|basename|stage[XN]'
 BUNDLE_INTERNAL='^(INPUTS|MANIFEST|OUTPUTS)\.tsv$|^run\.sh$|^(PROVENANCE|README)\.md$|^env\.lock$'
@@ -223,15 +223,15 @@ if [ "${SELFTEST:-0}" = "1" ]; then
   expect fail "COMMAND-FORM reference to a missing file"    "printf 'weekly: \`bash tools/hygiene.sh\`\\n' >> CLAUDE.md"
   expect pass "COMMAND-FORM reference that resolves"        "printf 'see \`cat agreements/A.md\` first\\n' >> CLAUDE.md"
   # ...and the two cases it must NOT reject (WA-A.1's second half).
-  expect pass "a bare name a FUTURE row will create"        "printf 'the row writes \`s01_census.py\`\\n' >> ROADMAP.md"
+  expect pass "a bare name a FUTURE row will create"        "printf 'the row writes \`s01_census.py\`\\n' >> IDEAS.md"
   expect pass "docs/decisions may name a DELETED file"      "mkdir -p docs/decisions && printf 'retired \`results/R0/n.tsv\`\\n' > docs/decisions/0001-x.md"
   # The two classes the widened extractor started rejecting when it began reading
-  # ROADMAP.md and BLOCKED.md: a bundle-relative OUTPUT, and a path into scratch.
-  expect pass "a ROADMAP row names a table it WILL write"   "printf 'the row writes \`tables/census.tsv\`\\n' >> ROADMAP.md"
+  # IDEAS.md and BLOCKED.md: a bundle-relative OUTPUT, and a path into scratch.
+  expect pass "a scanned doc names a table it WILL write"     "printf 'the row writes \`tables/census.tsv\`\\n' >> IDEAS.md"
   expect pass "BLOCKED.md names a file in gitignored scratch" "mkdir -p docs && printf 'left at \`ARIS_OUTPUT/r01/scripts/probe.py\`\\n' > docs/BLOCKED.md"
   # ...and the class that must STILL be caught, so the two skips above did not
   # simply switch the check off for anything with a slash in it.
-  expect fail "a REPO-ROOT path that does not exist"        "printf 'weekly: \`bash tools/hygiene.sh\`\\n' >> ROADMAP.md"
+  expect fail "a REPO-ROOT path that does not exist"        "printf 'weekly: \`bash tools/hygiene.sh\`\\n' >> IDEAS.md"
   # A must-read that lives inside a SUBMODULE must still resolve — this is how the
   # agreements layer is consumed by a subproject.
   S="$T/sub"; P="$T/super"; mkdir -p "$S" "$P"

@@ -46,6 +46,20 @@ validate() {
       || { echo "MANIFEST.tsv header must be: artifact<TAB>script<TAB>command<TAB>unit<TAB>denominator"; fail=1; }
     awk -F'\t' 'NR>1 && NF!=5 {print "MANIFEST.tsv line " NR " has " NF " fields, want 5"; bad=1}
                 END {exit bad?1:0}' "$B/MANIFEST.tsv" || fail=1
+    # BS-17: unit and denominator must SAY something. Checking the field COUNT and not the
+    # field CONTENT is how a production tree reached 15 bundles with 100% known producers
+    # and 0.0% denominator coverage -- every number reproducible, none of them citable.
+    # "n/a - <why>" is accepted, as for seed (BS-9): a stated absence is a decision, an
+    # empty string is an oversight, and the two must not look alike.
+    awk -F'\t' 'NR>1 && NF==5 {
+        for (i=4; i<=5; i++) { v=$i; gsub(/^[ \t]+|[ \t]+$/, "", v)
+          if (v == "" || v == "-" || v == "?") {
+            what = (i==4 ? "unit" : "denominator")
+            print "BS-17: MANIFEST row " NR " (" $1 ") has an empty " what "."
+            print "       A rate with no " what " is not citable. State it, or write"
+            print "       \"n/a - <why>\" if this artifact carries no rate."
+            bad=1 } } }
+      END {exit bad?1:0}' "$B/MANIFEST.tsv" || fail=1
     while IFS=$'\t' read -r artifact script rest || [ -n "${artifact:-}" ]; do
       [ -z "${script:-}" ] && continue
       [ "$script" = "script" ] && continue
@@ -152,12 +166,19 @@ validate() {
   # record which track it belongs to, and inferring it from the gate id would make the
   # check fail open on any naming the guess did not anticipate. A grep over all of them
   # costs nothing and cannot miss a declared claim.
+  # v7: the research contract is the ONE claim authority. Resolving against launchers or a
+  # root CLAIMS.md kept a second claim architecture alive mechanically while the prose said
+  # otherwise -- two authorities that disagree within a week.
   ledger="${CLAIMS_MD:-}"
+  if [ -z "$ledger" ] && [ -n "$ROOT" ] && [ -f "$ROOT/idea-stage/docs/research_contract.md" ]; then
+    ledger="$ROOT/idea-stage/docs/research_contract.md"
+  fi
+  _legacy_ledger=0
   LEDGER_TMP=""
   LEDGER_NAME=""
   if [ -z "$ledger" ]; then
     ROOT="$(git -C "$B" rev-parse --show-toplevel 2>/dev/null)"
-    if [ -n "$ROOT" ] && ls "$ROOT"/launchers/*.md >/dev/null 2>&1; then
+    if [ "$_legacy_ledger" = 1 ] && [ -n "$ROOT" ] && ls "$ROOT"/launchers/*.md >/dev/null 2>&1; then
       LEDGER_TMP="$(mktemp)"
       cat "$ROOT"/launchers/*.md > "$LEDGER_TMP"
       ledger="$LEDGER_TMP"
@@ -165,7 +186,7 @@ validate() {
     fi
   fi
   if [ -z "$ledger" ]; then
-    for k in "$B/../../CLAIMS.md" "$(git -C "$B" rev-parse --show-toplevel 2>/dev/null)/CLAIMS.md"; do
+    for k in ${_legacy_ledger:+"$B/../../CLAIMS.md" "$(git -C "$B" rev-parse --show-toplevel 2>/dev/null)/CLAIMS.md"}; do
       [ -f "$k" ] && { ledger="$k"; break; }
     done
   fi
@@ -356,6 +377,12 @@ if [ "${SELFTEST:-0}" = "1" ]; then
   expect reject "BS-1 scripts/ is empty"                 "mv scripts/count.py ./count.py.bak"
   expect reject "MANIFEST header wrong"                  "printf 'a\tb\tc\td\te\n' > MANIFEST.tsv"
   expect reject "MANIFEST row has 4 fields not 5"        "printf 'n.tsv\tscripts/count.py\tcmd\tunit\n' >> MANIFEST.tsv"
+  # BS-17 -- the field COUNT was checked and the field CONTENT never was, which is how a
+  # production tree reached 0.0% denominator coverage with every bundle passing.
+  expect reject "BS-17 empty denominator"                "printf 'n2.tsv\tscripts/count.py\tcmd\tper RT\t\n' >> MANIFEST.tsv; outputs ."
+  expect reject "BS-17 empty unit"                       "printf 'n3.tsv\tscripts/count.py\tcmd\t\t6472 msr-msd pairs\n' >> MANIFEST.tsv; outputs ."
+  expect reject "BS-17 a bare dash is not a denominator" "printf 'n4.tsv\tscripts/count.py\tcmd\tper RT\t-\n' >> MANIFEST.tsv; outputs ."
+  expect accept "BS-17 'n/a - <why>' is a stated absence" "printf 'n5.tsv\tscripts/count.py\tcmd\tn/a - a figure\tn/a - carries no rate\n' >> MANIFEST.tsv; outputs ."
   expect reject "BS-13 a figure no MANIFEST row claims" \
     "grep -v '^figures/' MANIFEST.tsv > m && mv m MANIFEST.tsv; outputs ."
   expect accept "BS-13 figure with no data table WARNS only" \
@@ -409,7 +436,9 @@ fi
 B="${1:?usage: bundle_valid.sh results/<ROW-ID>}"
 if validate "$B"; then
   echo "OK: $B passes BS-1..BS-10."
-  echo "Now open INPUTS.tsv and recognise the inputs yourself — that half is not automatable (BUNDLE_SPEC, Acceptance)."
+  echo "bundle_status: REPRODUCIBLE   human_input_audit: PENDING"
+  echo "Downstream work may continue on this bundle now. The input audit is a separate,"
+  echo "non-blocking state, required only before a number becomes a paper or thesis claim."
   exit 0
 fi
 exit 1

@@ -119,7 +119,7 @@ intended, not as it is; where they diverge the values win and the schema is corr
 
 ## Bundling a number
 
-**WA-B.0** [WHEN starting a gate] A gate does not start in a checkout whose governance submodule is not
+**WA-B.0** [WHEN beginning provenance-bearing execution] A gate does not start in a checkout whose governance submodule is not
 at the revision that checkout's branch records. BS-10 writes the revision into every bundle
 and BS-6 makes bundles write-once, so a gate run under a stale pin seals the wrong sha into
 an artifact that cannot be corrected.
@@ -192,32 +192,22 @@ correct and necessary; it is not evidence and not progress.
 
 ## Compute, loops and sessions
 
-**WA-C.1** [WHEN more than one session may touch this checkout] One agent process writes to one checkout at a time. A second reader may
-think, review, and pair on design at any time; it may not hold open file handles on a tree
-another agent is writing.
+**WA-C.1** [WHEN more than one session may write here] **Concurrent writers may not share a
+writable unit.** By default that unit is the checkout. Where task-scoped locking is enabled
+(`AGENT_LOCK_SCOPE=task`, `TASK=<name>`) it is `ARIS_OUTPUT/<task>/`. Git operations stay
+repository-scoped regardless and must not race with worktree creation or removal, or with
+any other git mutation — a worktree has its own working files but **shares `.git`, its refs
+and its config**.
+- check: `checks/no_concurrent_writer.sh` — SessionStart hook; `--release` at SessionEnd
+- validated: 2026-09-14 — reworded from the v6 form, which described checkout topology and
+  said when "a second checkout is needed", i.e. prescribed execution structure. The
+  invariant is what survives; the topology was ARIS's to decide.
 
-**One checkout is the normal case.** Sequential gates share one working directory, each in
-its own `ARIS_OUTPUT/<gate>/`; sessions that only read, analyse or explore share it too. A
-second checkout (a per-checkout working copy) is needed ONLY when two gates compute at the same time
-and both will COMMIT — that is the single thing one directory cannot do, because they collide
-on the git index and on the lock. Remove a worktree when its gate lands; a tree that outlives
-its gate is a stale checkout carrying stale governance.
-
-⚠️ **A worktree isolates the working directory, NOT `.git`.** Worktrees share the object
-store, the refs, and `.git/config`. So `git worktree add` while another session is mid-git
-operation can race and leave a `.git/config.lock` behind, and the agent lock does not prevent
-it — that lock guards the working directory, which is not what is being contended.
-
-**Create or remove a worktree when no other session is running git.** A stale `*.lock` under
-`.git/` with no `git` process alive is safe to delete; one with a live `git` process is not,
-and the check is `pgrep git`, not the file's age.
-- check: `checks/no_concurrent_writer.sh` (SessionStart hook)
-- validated: 2026-08-31 — files appeared mid-run during a stage and were recorded as blocked
 
 **WA-C.3** [WHEN judging whether a run is alive] Liveness is a claim and carries a grade.
 "That run is dead" is INFERRED unless both the process table AND the directory's newest mtime
 have been checked and recorded. A job that has written nothing for ten minutes is not dead.
-An exit code in 128–160 is a signal, not an error.
+An exit code in 128–160 may encode signal termination; decode it before classifying the run — a signal can perfectly well mean failure.
 - check: `manual`
 - validated: PROVISIONAL 2026-09-08
 
