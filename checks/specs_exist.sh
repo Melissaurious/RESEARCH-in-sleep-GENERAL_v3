@@ -175,7 +175,9 @@ for sm in $SUBMODULES; do
     fail=1
   fi
 
-  main_pin="$(git rev-parse "main:$sm" 2>/dev/null || true)"
+  # --verify: without it, rev-parse echoes its own argument back when the ref does not
+  # exist (a fresh project has no main yet), and the note fires with that as the "sha".
+  main_pin="$(git rev-parse --verify --quiet "main:$sm" 2>/dev/null || true)"
   if [ -n "$main_pin" ] && [ "$main_pin" != "$recorded" ]; then
     echo "PIN NOTE: $sm here is ${recorded:0:7}; main records ${main_pin:0:7}."
     echo "          Deliberate moves are fine and need a decision record. An accidental one"
