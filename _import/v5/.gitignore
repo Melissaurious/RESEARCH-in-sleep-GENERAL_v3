@@ -1,0 +1,23 @@
+# Generated live snapshot (regenerate with compute/refresh_resources*.sh)
+compute/ibex_resources.md
+
+# Outputs & logs
+ARIS_OUTPUT/
+**/logs/
+*.out
+*.err
+
+# Python / conda cruft
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+
+# Tool-specific configurations & credentials
+.claude/
+telegram.env
+*.env
+# but DO track the permission config
+!.claude/settings.json
