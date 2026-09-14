@@ -53,7 +53,11 @@ Upstream methodology at `~/aris_repo` — *auto-research-in-sleep*. Installed, n
 
 - **`mcp-servers/codex-exec/`** — the cross-model review bridge. This is the amenity worth
   taking; it does what `review.sh` shells out to, as an MCP server.
-- **Skills** — link the ~8 you use. Every skill's name and description is loaded into every
+- **`skills/run-experiment-ibex/`** (in this layer) **overrides ARIS's generic
+  `run-experiment`.** That one launches remote work over SSH + `screen`: no SLURM
+  allocation, no job id to size from or account against, and it dies with the connection.
+  Wrong for every job on this cluster. `new_project.sh` links it into `.claude/skills/`.
+- **Other ARIS skills** — link the ~8 you use. Every skill's name and description is loaded into every
   session, so 82 linked skills is a standing tax on every prompt
   (`agreements/SESSION_HYGIENE.md`).
 

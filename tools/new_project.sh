@@ -46,7 +46,12 @@ printf '# BLOCKED\n\nOpen questions, timestamped: what is needed, why, the optio
 printf '# LOG\n\nNotes that are not gates (WA-G.1).\n' > docs/log.md
 printf '# DATA REGISTER\n\nOne row per input: path, sha256, bytes, mode, and how it was obtained.\nInherited-baseline rows name their bundle or carry the `operator-supplied design\nfact` tag with a person and a date (WA-L.3).\n' > data/README.md
 printf '# SIDEWORK\n\nNothing here is a number. No bundle, no acceptance. A finding earns one thing:\nthe right to become a gate, through research_contract.md like any other.\n' > sidework/README.md
-say "templates copied"
+# The Ibex skill OVERRIDES ARIS's generic run-experiment, which launches remote work over
+# SSH + screen -- no allocation, no job id, dies with the connection. Symlinked into the
+# submodule so it moves with the pin.
+mkdir -p .claude/skills
+ln -sfn ../../general/skills/run-experiment-ibex .claude/skills/run-experiment-ibex
+say "templates copied; run-experiment-ibex skill linked"
 
 # README must list every agreements/ and site/ spec, or specs_exist.sh fails (by design).
 {

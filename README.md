@@ -41,6 +41,7 @@ v7 keeps the rigor and moves the gate onto an independent reviewer.
 | `checks/` | the runnable half of the rules — every one ships a `SELFTEST=1` target |
 | `templates/LAUNCHER.md` · `LAUNCHER_EXAMPLE.md` | the scaffold, and a filled one that passes |
 | `templates/GATE_WORKFLOW.md` | running one gate, unattended |
+| `skills/run-experiment-ibex/` | SLURM skill for Ibex — **overrides ARIS's generic `run-experiment`**, which uses SSH + screen |
 | `tools/review.sh` | **the gate.** An independent model reviews the plan and the result. |
 | `tools/check_launcher.py` | refuses a launcher that cannot run unattended |
 | `tools/bundle.sh` · `index.sh` · `dispatch.py` · `cache.py` | bundle assembly, rollup, machine choice, caching |
