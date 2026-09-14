@@ -124,7 +124,18 @@ def check(path: Path) -> list[str]:
                 f"idea-stage/docs/research_contract.md (e.g. C1) -- the launcher\n"
                 f"                   references claims, it does not own them (WA-L.1)")
     if not claims:
-        problems.append("NO CLAIMS        section 6 names no claim this task tests")
+        # A LIGHT recon gate legitimately settles NOTHING -- WA-B.3 forbids a LIGHT number
+        # from entering a claim at all. Demanding a claim id there would push the author to
+        # invent one, which is the opposite of what the rule protects.
+        if re.search(r"\bnone\b.*\brecon\b|\brecon\b.*\bnone\b", text, re.I):
+            pass
+        else:
+            problems.append(
+                "NO CLAIMS        section 6 names no claim this task tests.\n"
+                "                   If this is a LIGHT recon gate that settles nothing, say so\n"
+                "                   explicitly: 'none - LIGHT recon, settles no claim'.\n"
+                "                   A LIGHT number may not enter a claim (WA-B.3), so inventing\n"
+                "                   one to satisfy this check defeats the rule.")
 
     return problems
 
