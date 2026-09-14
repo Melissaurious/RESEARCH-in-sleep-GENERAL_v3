@@ -180,6 +180,19 @@ uncontended — and validate the harness interactively before queueing.
 
 ## S — Session
 
+**WA-K.2** [WHEN a tool, package or module appears to be missing] **Sweep before
+concluding ABSENT, and never install to work around a sweep you did not do.** A dependency
+is usually present in a *different* environment on borg or Ibex, not missing. Sweep every
+env on both machines, and on the cluster check modules too — remembering that `module avail`
+comes back empty even where software is installed. Only after a full sweep is `ABSENT` a
+finding; record the grade and the exact working invocation
+(`EVIDENCE_STANDARDS` §2). Mechanics: `site/COMPUTE.md` § Finding a dependency.
+⛔ Never install into the base environment, and never into a shared env to satisfy one gate
+without saying so — a silent install makes every earlier result irreproducible.
+- check: `manual` — the sweep output is in PLAN.md before any install
+- validated: 2026-09-14 — a project standardised on one env and repeatedly re-derived tools
+  that already existed elsewhere on the same machine
+
 **WA-A.2** [WHEN a loop reports its own work complete] **A loop may DRIVE but may not ACQUIT.** Iteration decides whether a step
 is complete, never whether a result is correct or good enough.
 - check: `manual` — the agent never writes its own verdict line

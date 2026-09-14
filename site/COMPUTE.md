@@ -77,3 +77,49 @@ Generated, not tracked — regenerate rather than trusting a stale copy:
     sinfo -o '%P %a %l %D %G'       # cluster partitions
     squeue -u "$USER"               # own queue
     sacct -j <id> --format=Elapsed,MaxRSS,State    # after a run, for WA-K.1 sizing
+
+---
+
+## Finding a dependency — sweep both machines before concluding it is missing (WA-K.2)
+
+A package is far more often in *another* environment than genuinely absent. Installing to
+work around a sweep you did not do is how an env drifts and earlier results stop reproducing.
+
+```bash
+# ── borg: what environments exist, and which hold the package ────────────────
+conda env list
+for e in $(conda env list | awk '/^[a-zA-Z]/{print $1}' | grep -v '^base$'); do
+  p="$HOME/miniconda3/envs/$e/bin/python"
+  [ -x "$p" ] && out=$("$p" -c "import <pkg>; print(getattr(<pkg>,'__version__','?'))" 2>/dev/null) \
+    && printf '  %-24s %s\n' "$e" "$out"
+done
+
+# ── borg: a command-line tool, not a python package ──────────────────────────
+for e in $HOME/miniconda3/envs/*/bin/<tool>; do [ -x "$e" ] && echo "$e"; done
+
+# ── Ibex: the same sweep over the cluster's envs ─────────────────────────────
+ssh $IBEX 'ls -1 /ibex/user/$USER/conda-environments/'
+ssh $IBEX 'for e in /ibex/user/$USER/conda-environments/*/bin/python; do
+             printf "%-60s " "$e"; "$e" -c "import <pkg>; print(\"ok\")" 2>/dev/null || echo "-" ; done'
+
+# ── Ibex: modules ────────────────────────────────────────────────────────────
+ssh $IBEX 'module avail <keyword> 2>&1 | head -40'
+ssh $IBEX 'module spider <keyword> 2>&1 | head -40'    # finds what `avail` hides
+```
+
+⚠️ **`module avail` can come back empty where the software is installed** — it reflects the
+modules visible to the current hierarchy, not what exists. `module spider` searches all of
+them. And conda dependencies usually live under a named env rather than the base install.
+
+⚠️ **Presence is not capability.** A package that imports can still fail on real input
+(`EVIDENCE_STANDARDS` §2): run it on real project data and record the grade — `VERIFIED`,
+`WORKAROUND_VERIFIED` (with the flag), `PRESENT_BUT_BROKEN`, `DATA_INADEQUATE`, or `ABSENT`.
+**`ABSENT` is only honest after the full sweep above.**
+
+### If it really is absent
+
+1. Say so in `PLAN.md`, with the sweep output.
+2. Prefer a **new** env over mutating a shared one. `retron_tradicional` is used by earlier
+   results; adding to it silently changes what those results would reproduce as.
+3. Never the base environment.
+4. Record the env name and the exact install command in the bundle's `env.lock`.
