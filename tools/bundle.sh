@@ -117,7 +117,7 @@ STATUS: UNVERIFIED — \`run.sh\` has not yet been rerun from this assembled bun
 
 ## 1 · What was measured
 
-<the number, its unit, and the population its denominator equals (WA-D.7)>
+<the number, its unit, and the population its denominator equals (WA-D.3)>
 
 ## 2 · Counts, including the ones that look bad (BS-5)
 
@@ -129,7 +129,7 @@ STATUS: UNVERIFIED — \`run.sh\` has not yet been rerun from this assembled bun
 
 Dropped, and why: <never footnote a failure>
 
-## 3 · The denominator's second count (WA-D.7)
+## 3 · The denominator's second count (WA-D.3)
 
 Population: <in words a reader can check>
 Independent route: <the code that shares nothing with the producing script>

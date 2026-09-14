@@ -8,7 +8,7 @@ installation replaces this file and changes no rule.
 Split with `site/COMPUTE.md`, which is the entry point and keeps:
 
 - the **escalation thresholds** (WA-K.1) — when a job leaves `borg` at all;
-- `--account=pi-hohndor`, and the WA-K.5 note on submission order;
+- `--account=pi-hohndor`, and the WA-K.1 note on submission order;
 - environment activation and `env.lock` for a bundle (BS-8);
 - the live-state one-liners.
 
@@ -129,7 +129,7 @@ job-specific lines under it.
     # module load cuda/12.2
     # module load mmseqs2/14.7e284
 
-    # Name the harness in the log, and fail loudly if an import is missing (WA-K.2).
+    # Name the harness in the log, and fail loudly if an import is missing (WA-K.1).
     echo "Host $(hostname) | Env $CONDA_ENV | Python $(which python)"
     python -c "import <pkg1>, <pkg2>; print('imports ok')"
 
@@ -200,7 +200,7 @@ be escaped, `\$VAR` — e.g. `\$SLURM_ARRAY_TASK_ID`.
 
 | partition | max time | GPU types | for |
 |---|---|---|---|
-| `debug` | 2 hr | v100, p6000 | the WA-K.2 harness check — ✔ schedules; ⚠ **not CPU-only**: it allocated the GPU node `gpu510-32` on 2026-09-06 |
+| `debug` | 2 hr | v100, p6000 | the WA-K.1 harness check — ✔ schedules; ⚠ **not CPU-only**: it allocated the GPU node `gpu510-32` on 2026-09-06 |
 | `gpu4` | 4 hr | a100 ×4/×8, v100, p100, gtx_1080_ti | quick tests, short jobs |
 | `gpu24` | 24 hr | a100 ×4, v100 ×8 ✔ (`sinfo -p gpu24`) | most runs |
 | `gpu72` | 3 days | a100 ×4, v100 ×8 | multi-day |
@@ -216,33 +216,33 @@ be escaped, `\$VAR` — e.g. `\$SLURM_ARRAY_TASK_ID`.
 `gpu_h200`); older P100 / P6000 / GTX 1080 Ti / RTX 2080 Ti in limited numbers.
 Multiple GPUs on one node: `--gres=gpu:a100:4`.
 
-⚠ Starting points, to be replaced by a measurement (WA-K.3), not used as an answer:
+⚠ Starting points, to be replaced by a measurement (WA-K.1), not used as an answer:
 heavy GPU `--partition=gpu24 --gres=gpu:a100:1`; quick test
 `--partition=gpu4 --gres=gpu:v100:1`.
 
 ## 6 · Preflight and sizing — the mechanics
 
-The rules are WA-K.2 (validate the harness interactively before queuing), WA-K.3 (size
-from measured per-unit rate × N), WA-K.4 (representative smoke sample) and WA-K.5
+The rules are WA-K.1 (validate the harness interactively before queuing), WA-K.1 (size
+from measured per-unit rate × N), WA-K.1 (representative smoke sample) and WA-K.1
 (cheap gating jobs before large arrays). They are not restated here. What this
 installation runs to satisfy them:
 
-    # WA-K.2 — ~60 s on debug, before anything is queued
+    # WA-K.1 — ~60 s on debug, before anything is queued
     srun --account=pi-hohndor --cpus-per-task=4 --mem=8G \
          --time=00:20:00 --partition=debug --pty bash -i
     /ibex/user/$USER/conda-environments/<env>/bin/python -c "import <pkg>; print('ok')"
     ls <run_script>
 
-    # WA-K.3 — after the smoke job, read the real per-unit cost off the finished job
+    # WA-K.1 — after the smoke job, read the real per-unit cost off the finished job
     sacct -j <JOB_ID> --format=JobID,Elapsed,MaxRSS,State,ReqTRES%40
     seff <JOB_ID>
 
 ✔ Both run. `seff 51398871_1` on 2026-09-06 returned `Memory Utilized: 5.31 GB`,
 `Memory Efficiency: 16.58% of 32.00 GB`, `CPU Efficiency: 20.28%` — i.e. the request was
-4x too large on memory, which is the number WA-K.3 wants and `sacct` alone does not give.
+4x too large on memory, which is the number WA-K.1 wants and `sacct` alone does not give.
 ✔ The `srun --partition=debug` preflight above ran as job 51398870.
 
-⚠ The GENERAL_v5 source pairs WA-K.2 with a note that a module listing can come back
+⚠ The GENERAL_v5 source pairs WA-K.1 with a note that a module listing can come back
 empty even when the software is installed, and that dependencies usually live under a
 named environment rather than the base install — which is why the import preflight goes
 **inside** the batch script as well as in the interactive session.
@@ -262,7 +262,7 @@ named environment rather than the base install — which is why the import prefl
     seff <JOB_ID>
     sinfo -p gpu24 -o "%N %G %t"
 
-`sacct`/`seff` after the run are what WA-K.3 sizes the next job from, and COMPUTE.md
+`sacct`/`seff` after the run are what WA-K.1 sizes the next job from, and COMPUTE.md
 already names `sacct -j <id> --format=Elapsed,MaxRSS,State` for that purpose.
 
 ## 8 · Live resource state
@@ -330,7 +330,7 @@ bundle, per WA-B.1, and not directly off the cluster.
 file: a `debug` preflight (51398870), a 3-task array (51398871), a resubmit (51399369)
 and a single `--wrap` job (51399374). That exercised §1 login, §2 the conda path and the
 account, §3 `export PATH`, §4 all three submission shapes plus `--parsable` and `%A_%a`,
-§5 `batch`/`debug`/`gpu24`, §6 the WA-K.2 preflight and `seff`, §7 `squeue`/`sacct`/`seff`,
+§5 `batch`/`debug`/`gpu24`, §6 the WA-K.1 preflight and `seff`, §7 `squeue`/`sacct`/`seff`,
 and §9 `scp` in both directions. **Nothing in this file was contradicted.**
 
 Still unproven, and still ⚠: `/ibex/user/rioszemm/experiments/` and its `logs/` (that run

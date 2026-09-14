@@ -5,7 +5,7 @@
 #
 # Creates the tree, mounts this layer as a submodule at general/, copies the templates,
 # installs .claude/settings.json, and proves the checkout is governed by running
-# specs_exist.sh. It does NOT write GOALS, CLAIMS or a launcher — those are the operator's,
+# specs_exist.sh. It does NOT fill the research contract or a launcher — those are yours,
 # and a scaffold that pre-fills them invites a gate to start against a template.
 set -uo pipefail
 
@@ -14,7 +14,7 @@ DEST="${1:-}"
 LAYER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 LAYER_URL="${2:-$LAYER_DIR}"
 
-[ -e "$DEST" ] && { echo "REFUSING: $DEST already exists. Renaming is reversible; overwriting is not (WA-C.5)." >&2; exit 1; }
+[ -e "$DEST" ] && { echo "REFUSING: $DEST already exists. Renaming is reversible; overwriting is not (WA-S.1)." >&2; exit 1; }
 
 say() { printf '  %s\n' "$*"; }
 
@@ -28,8 +28,10 @@ git -c protocol.file.allow=always submodule add -q "$LAYER_URL" general 2>/dev/n
   || { echo "FAILED to add the layer as a submodule from $LAYER_URL" >&2; exit 1; }
 say "layer mounted at general/ ($(git -C general rev-parse --short HEAD))"
 
-cp general/templates/PROJECT_CLAUDE.md CLAUDE.md
-cp general/templates/LAUNCHER.md launchers/LAUNCHER_TEMPLATE.md
+cp general/templates/PROJECT_CLAUDE.md     CLAUDE.md
+cp general/templates/RESEARCH_CONTRACT.md  research_contract.md
+cp general/templates/LAUNCHER.md           launchers/LAUNCHER_TEMPLATE.md
+cp general/templates/LAUNCHER_EXAMPLE.md   launchers/LAUNCHER_EXAMPLE.md
 # __SCRATCH__ is a placeholder in the templates; substitute the project's scratch dir name.
 # Left unsubstituted, allowWrite names a directory that does not exist and the first gate
 # cannot write anything - which is how it shipped once, and the failure looked like a
@@ -40,10 +42,10 @@ python3 -c "import json,sys; json.load(open('.claude/settings.json'))" \
   || { echo "settings.json does not parse after substitution" >&2; exit 1; }
 grep -q '__SCRATCH__' .gitignore .claude/settings.json \
   && { echo "__SCRATCH__ survived substitution" >&2; exit 1; }
-printf '# BLOCKED\n\nOpen questions, timestamped: what is needed, why, the options, the\nrecommended default (WA-S.4).\n' > docs/BLOCKED.md
-printf '# LOG\n\nNotes that are not gates (RM-2).\n' > docs/log.md
-printf '# DATA REGISTER\n\nOne row per input: path, sha256, bytes, mode, and how it was obtained.\nInherited-baseline rows name their bundle or carry the `operator-supplied design\nfact` tag with a person and a date (WA-I.5).\n' > data/README.md
-printf '# SIDEWORK\n\nNothing here is a number. No bundle, no acceptance. A finding earns one thing:\nthe right to become a gate, through CLAIMS.md and ROADMAP.md like any other.\n' > sidework/README.md
+printf '# BLOCKED\n\nOpen questions, timestamped: what is needed, why, the options, the\nrecommended default (WA-S.1).\n' > docs/BLOCKED.md
+printf '# LOG\n\nNotes that are not gates (WA-G.1).\n' > docs/log.md
+printf '# DATA REGISTER\n\nOne row per input: path, sha256, bytes, mode, and how it was obtained.\nInherited-baseline rows name their bundle or carry the `operator-supplied design\nfact` tag with a person and a date (WA-L.3).\n' > data/README.md
+printf '# SIDEWORK\n\nNothing here is a number. No bundle, no acceptance. A finding earns one thing:\nthe right to become a gate, through research_contract.md like any other.\n' > sidework/README.md
 say "templates copied"
 
 # README must list every agreements/ and site/ spec, or specs_exist.sh fails (by design).
@@ -53,7 +55,8 @@ say "templates copied"
   printf '## Layout\n\n'
   printf '| path | what it is |\n|---|---|\n'
   printf '| `CLAUDE.md` | project context; points at `general/` for every rule |\n'
-  printf '| `launchers/` | one per track — objective, kill criteria, inputs, claims, gates. The only document written by hand. |\n'
+  printf '| `research_contract.md` | the standing science: question, claims, datasets, baselines. Written by hand. |\n'
+  printf '| `launchers/` | one per track — objective, kill criteria, inputs, gates. Written by hand. |\n'
   printf '| `INDEX.md` | GENERATED rollup of claims and bundles (`bash general/tools/index.sh`). Never hand-edited. |\n'
   printf '| `results/` | bundles, and nothing else |\n'
   printf '| `retros/` | one per gate |\n'
@@ -71,14 +74,16 @@ echo
 if bash general/checks/specs_exist.sh; then
   echo
   say "GOVERNED. Next, in this order:"
-  say "  1. CLAUDE.md   — subject, environment, paths"
-  say "  2. launchers/LAUNCHER_<track>.md — copy LAUNCHER_TEMPLATE.md and fill it"
+  say "  1. CLAUDE.md            — subject, environment, paths, budget   (~60 lines)"
+  say "  2. research_contract.md — the standing science: question, claims,"
+  say "                            datasets, baselines, kill criteria     (~60 lines)"
+  say "  3. launchers/LAUNCHER_<track>.md — the task now; see LAUNCHER_EXAMPLE.md (~100)"
   say ""
   say "The launcher is the ONLY document you write: objective, kill criteria, non-goals,"
   say "inputs with trust grades, claims (section 3b), and gates. There is no separate"
   say "goals file, claim ledger or roadmap. INDEX.md is GENERATED by tools/index.sh."
   say ""
-  say "A gate does not start before its claim is declared UNPROVEN in the launcher (CL-1)."
+  say "A gate does not start before its claim is declared UNPROVEN in research_contract.md (WA-L.1)."
 else
   echo
   say "NOT GOVERNED — specs_exist.sh did not pass. Fix before starting any gate."

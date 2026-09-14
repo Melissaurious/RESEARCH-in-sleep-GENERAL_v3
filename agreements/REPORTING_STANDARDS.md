@@ -19,7 +19,7 @@ but a figure is **a view over a table that already landed**, never a second meas
 
 **The rule that makes this safe:** a figure script reads from the bundle's `tables/` and
 **nothing else** — never the source data. A script that consumes only landed tables adds
-no measurement, so it cannot widen the gate past WA-R.3, and it satisfies the
+no measurement, so it cannot widen the gate past WA-G.1, and it satisfies the
 figure-plus-TSV rule above automatically: the figure's data *is* a landed table.
 
 Consequences worth stating, because each is a way gates go wrong:
@@ -99,7 +99,7 @@ required **columns of `MANIFEST.tsv`**, so the bundle already carries them and
 **Withdrawn:** earlier versions of this spec mandated a per-artifact
 `<basename>.prov.json` written by a `prov.py` helper and swept by a `check_prov.py`.
 That was a second provenance system for the same job, and it named two tools this repo
-does not contain — a rule pointing at a missing file is silent (WA-P.3), and two
+does not contain — a rule pointing at a missing file is silent, and two
 mechanisms for one job is exactly what a single source of agreements is for. See the
 graveyard in `agreements/WORKING_AGREEMENT.md`.
 

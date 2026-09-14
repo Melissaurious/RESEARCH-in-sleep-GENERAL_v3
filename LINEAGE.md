@@ -60,3 +60,18 @@ unlinked, because every skill description is loaded into every session
 - **The retroactive correction apparatus** that grew to sixteen registers in `RETRON-DB_V4`.
   All of it is downstream of having no gate at production time. With a gate it is unnecessary.
 - **43 of v6's 61 rules** — 18 never validated against a real case, the rest folded or cut.
+
+---
+
+## Graveyard — rules removed, and why
+
+_Not re-proposed without new evidence. Entries do not link the deleted thing: a dead reference in a live document is its own defect._
+| removed | why |
+|---|---|
+| operator approves the plan; operator recognises `INPUTS.tsv`; operator grants ACCEPTED_RISK | three blocking human stops inside one measurement. Replaced by WA-A.1. |
+| "interpretation is the operator's call, always" | right about authorship, wrong about timing. Now WA-A.4, asynchronous. |
+| every operator-facing reply is also a file in `docs/responses/` | pure overhead per exchange; no case where it caught anything |
+| per-artifact `prov.json` + `prov.py` + `check_prov.py` | a second provenance system for the same job. The bundle is the only one. |
+| separate `ROADMAP.md` and `CLAIMS.md` | contradicted WA-L.1 in the same repo. The launcher holds both. |
+| 18 PROVISIONAL rules | never validated against a real case |
+| one row = one measurement = one session, as the unit of *scope* | right about the number, wrong about the session; it deferred every scientific goal a project had |

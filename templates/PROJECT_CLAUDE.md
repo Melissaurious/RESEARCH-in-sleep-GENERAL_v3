@@ -31,7 +31,7 @@ Moving the pin is a deliberate commit with a decision record in `docs/decisions/
 - `launchers/LAUNCHER_<track>.md` — the active track. The authority on scope (WA-L.1).
 - `docs/decisions/` — settled decisions, numbered. Not re-argued in a session; superseded
   by a new record or not at all.
-- `data/README.md` — the input register, and the inherited-baseline rows (WA-I.5)
+- `data/README.md` — the input register, and the inherited-baseline rows (WA-L.3)
 
 Read when the situation applies:
 - `IDEAS.md` — deferred work. A session may propose promotion; it may never promote.
@@ -49,12 +49,12 @@ Read when the situation applies:
 <Only genuine overrides. Each names the rule it overrides and why. Delete this section if
 there are none — an empty conventions list is better than an invented one.>
 
-- **OVERRIDE — WA-E.2 script length ≤ N lines** (default 200). <why>
+- **OVERRIDE — script length ≤ N lines** (default 200). <why>
 
 ## File safety
 
 - Source data is read-only, enforced by file mode (WA-D.1).
-- This track writes to exactly one directory (WA-C.6) — see the active launcher §0.1, and
+- This track writes to exactly one directory (WA-D.1) — see the active launcher §0.1, and
   `.claude/settings.json`.
 - All scratch goes to `ARIS_OUTPUT/` — gitignored, disposable, allowed to be messy.
 - Numbers go to `results/<GATE>/` and nowhere else (WA-B.1).

@@ -31,7 +31,7 @@ correct response; changing the measurement is not.
 
     #SBATCH --account=pi-hohndor        # required on every Ibex job
 
-Submit cheap gating jobs before large arrays (WA-K.5): fairshare is consumed by what
+Submit cheap gating jobs before large arrays (WA-K.1): fairshare is consumed by what
 already ran, and requesting more GPUs lowers priority.
 
 ## Environments
@@ -76,4 +76,4 @@ Generated, not tracked — regenerate rather than trusting a stale copy:
     nvidia-smi                      # local accelerators
     sinfo -o '%P %a %l %D %G'       # cluster partitions
     squeue -u "$USER"               # own queue
-    sacct -j <id> --format=Elapsed,MaxRSS,State    # after a run, for WA-K.3 sizing
+    sacct -j <id> --format=Elapsed,MaxRSS,State    # after a run, for WA-K.1 sizing

@@ -138,7 +138,7 @@ validate() {
   # transcribed it into the ledger, and a later session reused that number for a
   # different claim — with a row already executing against the second one.
   #
-  # CL-1 says the claim exists as UNPROVEN BEFORE the row runs. CL-2 says the ledger is
+  # WA-L.1 says the claim exists as UNPROVEN BEFORE the row runs. WA-L.1 says the ledger is
   # the operator's. A row that hands itself a new id breaks both. A row that discovers a
   # new claim describes it in PROSE; the operator assigns the number. So: every claim id
   # the README proposes a status for must already be a row in CLAIMS.md.
@@ -174,7 +174,7 @@ validate() {
       [ -z "$cid" ] && continue
       grep -qE "^\|[[:space:]]*\`?(~~)?${cid}(~~)?\`?[[:space:]]*\|" "$ledger" \
         || { echo "BS-12: README proposes a status for $cid, which is not a declared claim in ${LEDGER_NAME:-$ledger}."
-             echo "       A gate may PROPOSE a new claim in prose; it may not assign the id (CL-1, CL-2)."
+             echo "       A gate may PROPOSE a new claim in prose; it may not assign the id (WA-L.1, WA-L.1)."
              fail=1; }
     done < <(grep -oE '^\|[[:space:]]*`?(~~)?([a-z0-9][a-z0-9_-]*:)?C[0-9]+[^|`[:space:]]*' "$B/README.md" \
              | grep -oE '([a-z0-9][a-z0-9_-]*:)?C[0-9]+[^|`[:space:]]*' | sed 's/~~$//' | sort -u)
