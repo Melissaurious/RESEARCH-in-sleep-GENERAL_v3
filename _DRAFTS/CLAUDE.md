@@ -1,91 +1,118 @@
-# CLAUDE.md — FINAL_RETRON_PROJECT_v7
+# CLAUDE.md — Retron large-scale mining project
 
-Bacterial retron systems: what a large-scale mining corpus of RT systems actually contains,
-on which unit, and how much of its apparent structure is biology rather than sequencing
-depth or annotation artefact.
+This project measures genome- and metagenome-derived RT/retron observations on explicit
+analytical units — raw record, genomic locus, exact RT, taxonomic occurrence and RT–ncRNA
+pair — so every downstream number has a named biological population and denominator.
+
+**One repo; git holds versions. Never create a version-numbered sibling project directory.**
 
 ## Governed by
 
-`general/` — pinned by sha. **ARIS owns the lifecycle**; `general/` constrains the science.
-This file declares only what neither can know: subject, environment, paths.
-⛔ It restates no rule. If something here contradicts `general/`, this file is wrong.
+`general/` is the governance layer and is pinned by git revision. ARIS owns the research
+workflow; `general/` constrains data safety, evidence standards, provenance, reporting,
+compute policy, Ibex execution and operator-only decisions.
 
-    bash general/checks/specs_exist.sh                   # must print OK before any gate
-    bash general/tools/install_ibex_overlay.sh --check   # Ibex routing still bound?
+Before provenance-bearing execution:
 
-## Environment
+```bash
+git submodule update --init --recursive
+bash general/checks/specs_exist.sh
+```
 
-| | |
-|---|---|
-| Conda env | `retron_tradicional` |
-| Local env | `/home/borg/miniconda3/envs/retron_tradicional` |
-| Ibex env | `/ibex/user/rioszemm/conda-environments/retron_tradicional` |
-| Project root | `/home/borg/RESEARCH-in-sleep-FINAL_RETRON_PROJECT_v7` |
-| Ibex experiments | `/ibex/user/rioszemm/experiments/` |
-| Ibex account | `pi-hohndor` — required on every job |
-| borg GPUs | 2 × RTX 4090, 24 GB — `CUDA_VISIBLE_DEVICES=0` or `1` |
-
-### In `retron_tradicional`
-
-`hmmsearch` `hmmbuild` `hmmalign` · `mafft` `muscle` · `cd-hit` `mmseqs` · `blastp` ·
-`trimal` · `cmsearch` `cmbuild` `cmfinder.pl` · `mkdssp`
-
-### ⚠️ NOT in `retron_tradicional` — sweep before concluding anything is missing (WA-K.2)
-
-| tool | where it actually is |
-|---|---|
-| `foldseek` | `/home/borg/miniconda3/envs/esmologs/bin/foldseek`; Ibex `module load foldseek/10-941cd33` |
-| `foldmason` | `/home/borg/miniconda3/envs/foldmason/bin/foldmason` — prefer the env over the pkgs copy |
-| `RNAfold` | `/home/borg/.local/bin/RNAfold` |
-| Pfam-A 37.0 (21,979 models) | **Ibex only** — `/ibex/user/rioszemm/the-retron-project/src/interproscan/interproscan-5.70-102.0/data/pfam/37.0/pfam_a.hmm` |
-
-⛔ **InterProScan on borg ships a stub database** — Pfam-A holds 3–4 profiles, TIGRFAM 1.
-A result from it is `DATA_INADEQUATE`, not a negative.
-
-⛔ Prefer a **new** env over mutating `retron_tradicional` — earlier results depend on it.
-Never the base environment.
+Read `general/CLAUDE.md` at session start.
 
 ## Read before acting
 
-1. `general/agreements/WORKING_AGREEMENT.md` **§1** — five rules, stop there
-2. `idea-stage/docs/research_contract.md` — the question, the claims, the known-wrong list.
-   **The single claim authority.** No `GOALS.md`, no `CLAIMS.md`, no `ROADMAP.md`.
-3. the active `launchers/LAUNCHER_*.md` — the task now
-4. `data/README.md` — the input register: path, sha256, mode, how obtained
+- `idea-stage/docs/research_contract.md` — single project claim authority.
+- `launchers/LAUNCHER_01_database_characterization.md` — current active task scope and autonomy envelope.
+- `data/README.md` — canonical inputs, prior resources, environments and trust state.
+- `docs/decisions/` — settled operator decisions; supersede by a new record, never by
+  silently rewriting history.
 
-`idea-stage/programme/` holds the 12 stage documents and the ideas brainstorm. **Source
-material, not an authority** — nothing cites a number from there.
+Read when relevant:
+- `/home/borg/RETRON_STAGES/` or the registered upstream stage briefs — idea/path/history source only,
+  not claim authority.
+- `IDEAS.md` — deferred work if present.
+- `docs/BLOCKED.md` — open questions and defaults.
 
-## Data
+There is no hand-maintained `GOALS.md`, `CLAIMS.md` or `ROADMAP.md` claim authority.
 
-| | |
-|---|---|
-| Corpus (42 files) | `/home/borg/RESEARCH-in-sleep-RETRON-DB_V3/MELISSA_DATA/json_files_input_june/` |
-| Corpus, Ibex mirror | `[confirm path]` — a gate that outgrows local RAM moves there rather than sampling |
-| Schema description | `/home/borg/RESEARCH-in-sleep-RETRON-DB_V5/templates/input_format_schema_only.md` |
-| Extraction helper | `.../RETRON-DB_V3/MELISSA_SCRIPTS/database_analysis/utils_FOR_ALL_FILES.py` (`PipelineData`) |
-| House report style | `.../MELISSA_SCRIPTS/database_analysis/PREVIOUS_ARIS_WORK/REPORT.html` |
+## Environment
 
-⛔ **`MELISSA_DATA/` and `MELISSA_SCRIPTS/` are read-only** — never modified, never re-run
-in place (WA-D.1, enforced by file mode).
+- **Primary local env:** `retron_tradicional`
+  - `/home/borg/miniconda3/envs/retron_tradicional`
+- **Primary Ibex env:**
+  - `/ibex/user/rioszemm/conda-environments/retron_tradicional`
+- **Project root:**
+  - `/home/borg/RESEARCH-in-sleep-FINAL_RETRON_PROJECT_v7`
+
+Do not use `base`.
+
+Special tools/resources live outside the primary environment and are registered in
+`data/README.md`; do not conclude a dependency is absent until the registered environments
+and Ibex resources have been checked.
+
+## Project conventions
+
+- Large canonical data stay in place and are read-only. Do not make another raw-data copy
+  merely to start a task.
+- Small, load-bearing reference files may be copied into the project after identity/hash is
+  recorded; if an equivalent copy already exists under `MELISSA_DATA/`, use it.
+- Prior projects and reports are sources to audit and reuse, not numeric authority.
+- Atypical biology is flagged before it is filtered. Distance, orientation, missing ncRNA,
+  multiplicity, contig-edge state, tool disagreement and unusual architecture are retained.
+- `MULTI` remains its own multi-label population and is not appended to a single RT family.
+- RT analyses do not silently mix ncRNA-anchor-only records into their denominator.
+- Never pool tool-specific fields whose provenance differs; preserve the original tool call.
+
+## Working storage
+
+- ARIS scratch for the current task: `ARIS_OUTPUT/01_database_characterization/` — disposable and gitignored.
+- Reproducible scientific products: `results/` with one directory per landed gate.
+- Registered expensive reusable derived datasets: `data/derived/` only when a launcher names
+  them and their producing bundle/hash is recorded.
+- Do not copy an entire `ARIS_OUTPUT/` task into `results/`. Land only what is required to
+  reproduce and understand the accepted measurement.
+
+## Before any negative or absence claim
+
+A zero/absence needs a positive control showing that the same instrument can recover a
+known-present case on an appropriate substrate. Null and refuting results are retained.
+
+## Stage documents and prior work
+
+`/home/borg/RETRON_STAGES/` contains useful scientific framing, old results, failure modes and paths.
+Use it to accelerate planning. When it conflicts with the current raw data, current project
+decisions, or a newer verified bundle, the latter wins.
+
+For database characterization, the most current historical source is
+`LAUNCHER_stage0_database_copy.md` together with the prior production project
+`/home/borg/RESEARCH-retron-db/`. The new task follows:
+
+**REUSE → VERIFY → GAP ANALYSIS → COMPUTE ONLY GAPS.**
 
 ## ARIS pipeline state
 
 | | |
 |---|---|
-| Research direction | Retron system discovery, classification, and RT–ncRNA relationships |
-| Current stage | `experiment-plan` — track `dbchar` |
-| Target venue | PhD thesis chapter `[N]` / manuscript |
-| `AUTO_PROCEED` | `true` — `/research-pipeline`'s default; this project runs unattended |
-| Executor / reviewer | Opus 5 High / ARIS reviewer routing (+ codex `gpt-5.6-sol`) |
-| Compute budget | per track, in the active launcher §9 |
+| Research direction | Build a defensible large-scale RT/retron catalogue from genome and metagenome mining outputs, then use explicit analytical objects to study RT classification/architecture, genomic organization, ncRNA association, annotation limits, diversity and RT–ncRNA co-evolution. |
+| Current stage | `contract` |
+| Target venue | PhD thesis plus retron methods/classification manuscript; journal venue TBD |
+| `AUTO_PROCEED` | `true` |
+| Executor / reviewer | ARIS-configured executor / independent reviewer per project profile and governance |
+| Compute budget | see the active launcher §9 |
+| Effort levels | ARIS defaults unless a launcher explicitly overrides them |
 
-## Known-wrong
+## Governance
 
-Full list with its evidence: `idea-stage/docs/research_contract.md` § Known-wrong.
-⚠️ Read it before reusing any prior number. Absence is loud; wrongness is quiet.
+ARIS owns lifecycle, `.aris/`, `idea-stage/`, `research-wiki/`, `paper/`,
+`EXPERIMENT_PLAN.md`, `EXPERIMENT_LOG.md`, loops and reviewer routing.
 
-The two that bite first: **coordinates are contig-based** (1 in 6 records has `start == 1`,
-where every arithmetic check passes anyway — verify by RT back-translation), and
-**`system_subtypes` is two tools on one locus** agreeing on 44.6% — carry it, never
-`groupby` it.
+`general/` owns how the work is constrained.
+
+Before the active task:
+
+```bash
+bash general/checks/specs_exist.sh
+python3 general/tools/check_launcher.py launchers/LAUNCHER_01_database_characterization.md
+```

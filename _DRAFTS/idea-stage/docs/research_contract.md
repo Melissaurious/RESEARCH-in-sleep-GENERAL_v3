@@ -1,117 +1,130 @@
-# RESEARCH CONTRACT — retron systems
-
-_The standing science. Revised when the science changes, not when a task changes.
-The per-task document is `launchers/LAUNCHER_<track>.md`, which references claim ids._
-
+# RESEARCH CONTRACT — Retron large-scale mining and biological analysis
+_Standing science only. Stable across tasks; per-task execution belongs in `launchers/` and ARIS owns the workflow._
 ## The question
+How can a large genome- and metagenome-derived catalogue of reverse transcriptase (RT) systems be converted from heterogeneous mining records into defensible biological objects, and what can those objects reveal about retron diversity, RT architecture and classification, genomic organization, ncRNA association, annotation limits, and RT–ncRNA co-evolution?
 
-Retrons are reverse transcriptases transcribed in one operon with their own RNA substrate —
-a trait that distinguishes them from other RT families. A large-scale mining pipeline has
-assembled a corpus of RT systems from eight public databases using three independent
-detectors, but **nobody has counted it exactly, resolved its misannotations, or fixed what
-a "unique system" means.**
-
-Three units — locus, unique RT, unique RT–ncRNA pair — are currently used interchangeably.
-In prior work the locus→unique-RT factor ranged **1.74×–7.39× by family**, so a rate quoted
-on one unit is not the same number on another, and **every downstream claim in this project
-currently rests on a denominator nobody can name.**
-
-What is unknown: what this corpus contains, on which unit, and which of its apparent
-structure is biology rather than sequencing depth or annotation artefact.
+Retrons are the primary biological target. Other bacterial and archaeal RT families are retained as evolutionary and methodological comparators.
 
 ## Claims
 
-Born `UNPROVEN`. A claim reaches the paper only from `SUPPORTED` with circularity `NONE`
-or `LOW`. **`REFUTED` is a result, not a failure.**
+Every claim is born `UNPROVEN`. Prior projects, stage notes, reports, scripts and bundles are evidence/idea sources, not automatic authority here.
 
 | id | claim | status | settled by | circularity |
 |---|---|---|---|---|
-| `C1` | The three uniqueness keys (RT sequence · locus · RT–ncRNA pair) are **not interchangeable**: the ratio between them varies by RT family by more than 2× | UNPROVEN | — | — |
-| `C2` | A substantial fraction of retron-RT-labelled loci carry **no detected ncRNA**, such that "retron locus" and "retron system" name different populations | UNPROVEN | — | — |
-| `C3` | The retron ncRNA CM match rate is **higher on retron-labelled RT families than on non-retron RT families** — the second rate being the control for the first | UNPROVEN | — | — |
-| `C4` | The three detectors **disagree materially** on retron RT annotation, and the disagreement is structured rather than random | UNPROVEN | — | — |
+| `C1` | The mined corpus contains non-uniform redundancy and source representation that materially changes the population described by a raw-record count. | `UNPROVEN` | — | `LOW` |
+| `C2` | Record, genomic locus, exact RT sequence, RT taxonomic occurrence and RT–ncRNA pair are non-equivalent analytical units and support different downstream questions. | `UNPROVEN` | — | `LOW` |
+| `C3` | RT0–RT7 and related RT sequence/structural elements can be given reproducible operational definitions with explicit failure and uncertainty states across relevant RT families. | `UNPROVEN` | — | `LOW` |
+| `C4` | RT domain geometry, catalytic motifs and additional sequence/structural features vary systematically across RT families/retron groups rather than being explained only by annotation convention. | `UNPROVEN` | — | `LOW` |
+| `C5` | Retron loci show reproducible patterns of ncRNA position, orientation, multiplicity and neighbouring architecture that can be separated from technical or annotation anomalies. | `UNPROVEN` | — | `LOW` |
+| `C6` | Bona fide RT–ncRNA pairs retain evidence of association beyond shared ancestry, taxonomy and detector-derived grouping. | `UNPROVEN` | — | `MEDIUM` |
+| `C7` | Disagreement among retron/RT annotation routes contains measurable information about detector scope, technical failure and candidate biological divergence; agreement is not independent corroboration when tools share provenance. | `UNPROVEN` | — | `LOW` |
+| `C8` | Apparent RT/retron diversity, saturation and taxonomic/ecological distribution change after correcting for redundancy, database composition and sampling depth. | `UNPROVEN` | — | `LOW` |
+| `C9` | Detection/localisation and boundary delimitation are separable measurable properties for ncRNAs, RT subdomains and operon boundaries. | `UNPROVEN` | — | `LOW` |
 
-⚠️ Scope every claim to what was audited — *"in this corpus"*, never *"in retrons"*.
-Sharper claims are expected to come **out of** stage 1, not to be pre-registered before it.
+⚠️ **No claim here is circularity `NONE`.** `C1`, `C2` and `C8` all describe units derived
+from **one JSON parse of one corpus** — a coordinate or extraction defect moves all of them
+together, so they can agree while all being wrong. That is `LOW`, not `NONE`, and the
+independent second count each gate owes (WA-D.3) is what prices it.
+
+## Canonical analytical objects
+
+The phrase “unique system” is never used without naming the operational unit.
+
+| object | working definition |
+|---|---|
+| raw record | one mining-pipeline output record |
+| RT occurrence | one RT call at one genomic occurrence |
+| locus | one genomic occurrence/context defined by auditable genomic identity and coordinates |
+| exact RT | exact amino-acid sequence identity, hashed from sequence in this project |
+| RT taxonomic occurrence | an exact RT observed in a declared genome/taxon occurrence |
+| RT–ncRNA association | observed RT/ncRNA relation with coordinates, strand, distance and multiplicity retained |
+| exact RT–ncRNA pair | exact RT + exact ncRNA after duplicate-call reconciliation; genuine multiplicity stays flagged |
+| analytical view | declared query over the canonical locus table, never an undocumented copied subset |
+
+Operational definitions may be refined by the task that measures them. Ambiguous/atypical observations are flagged rather than silently deleted.
 
 ## Datasets
 
-| name | path | trust |
-|---|---|---|
-| corpus (42 files: 41 RT families + `MULTI`) | `RESEARCH-in-sleep-RETRON-DB_V3/MELISSA_DATA/json_files_input_june/` | **RAW** — mirrored on Ibex |
-| schema description | `RETRON-DB_V5/templates/input_format_schema_only.md` | **RAW**, and a *hypothesis* — probe values (WA-D.4) |
-| extraction helper | `RETRON-DB_V3/MELISSA_SCRIPTS/database_analysis/utils_FOR_ALL_FILES.py` | **RAW**, read-only. `PipelineData` is a starting point, not a contract |
-| PADLOC retron CMs (21) | `RETRONS_january_2026/.../padloc/data/cm/padlocdb.cm` | **RAW** |
-| myRT HMMs (~2,051 seeds / 47 families) | `.../myRT/Models/HMM/RVT-All.hmm` | **RAW** |
-| DefenseFinder retron profiles (~39) | `~/.macsyfinder/models/defense-finder-models/profiles/*Retron*` | **RAW** |
-| Mestre / Toro supplementary | `RETRON_CLAUDE_PART1/supplementary_material/`, `RETRON_CLAUDE_PART1/Toro_2026/` | **RAW** |
-| **15 landed bundles** | `RESEARCH-retron-db/results/` | ⚠️ **RE-DERIVE** — see below |
-| generation-4 analysis (38 scripts) | `RETRON-DB_V3/ARIS_OUTPUT/stage1_db_analysis/` | **RE-DERIVE** — reuse the *architecture*, re-derive every number |
-| `research-wClaude-PART1_v2` `r01`–`r04` | — | **DO-NOT-USE** — stopped mid-flight, nothing landed |
+| name | path | what it is | trust |
+|---|---|---|---|
+| raw mining corpus | `/home/borg/RESEARCH-in-sleep-RETRON-DB_V3/MELISSA_DATA/json_files_input_june/` | canonical genome/metagenome mining output to inventory/hash | `RAW` |
+| current project metadata | `/home/borg/RESEARCH-in-sleep-FINAL_RETRON_PROJECT_v7/MELISSA_DATA/supplementary_material/databases_metadata_files/metadata_files/` | taxonomy/assembly/environment metadata where available | `RAW` |
+| input schema | `/home/borg/RESEARCH-in-sleep-FINAL_RETRON_PROJECT_v7/MELISSA_DATA/templates/input_format_schema_only.md` | intended structure; verify against real records | `RAW` |
+| prior production project | `/home/borg/RESEARCH-retron-db/` | prior bundles/views/reports/QA register | `RE-DERIVE` |
+| stage briefs | `/home/borg/RETRON_STAGES/` | ideas, paths, prior findings and dependencies | **not an authority** — a trust grade applies to a measurement; these are prose. Nothing cites a number from here. |
 
-⛔ **`MELISSA_SCRIPTS/` and `MELISSA_DATA/` are read-only.** Never modified, never re-run in place.
+No prior numeric measurement is `FROZEN` here unless a later decision explicitly promotes it and names the producing bundle.
 
-### Why the 15 bundles are RE-DERIVE, not FROZEN
+## Biological priors
 
-`ARIS_OUTPUT/qa/register/coverage.tsv` reports **100% known-producer and 0.0% denominator
-coverage** across every bundle. They reproduce; their numbers cannot be cited, because no
-table says what its rate is a rate *of*. `BS-17` now fails that condition at landing time.
-**One rerun per bundle makes them citable — that is not a re-investigation.**
+Known retron architecture, catalytic motifs, expected strand/orientation, ncRNA proximity and published subtype/domain conventions are priors/QC features, not automatic filters. ncRNA distance, CDS separation, overlap, orientation or unexpected order may reflect misassociation, overlapping systems, contig effects or real biology; Stage 1 records them before a later task decides how to use them.
 
-## Baselines
+## Baselines and metrics
 
-| claim | compared against | what would make BOTH wrong at once |
-|---|---|---|
-| `C1` | the three keys against each other | a shared extraction defect — all three derive from the same JSON parse, so a coordinate error moves all three together. ⭐ This is the pair with the *least* independence and it must be said. |
-| `C2` | `has_ncrna` flag vs the `ncrnas` array | ⚠️ the schema records that `has_ncrna` can be true while `ncrnas` is empty — the two must be reconciled per record, not assumed to agree |
-| `C3` | retron-labelled vs non-retron RT families | the CMs were built on retron ncRNAs, so a low non-retron rate is partly true by construction. **Circularity MEDIUM at best; price it** (`EVIDENCE_STANDARDS` §3) |
-| `C4` | DefenseFinder · PADLOC · myRT pairwise | all three were run by one pipeline over one window definition; a windowing error disagrees with nothing |
+| claim | metric / unit | baseline compared against | why the baseline can disagree |
+|---|---|---|---|
+| `C1`,`C2` | exact counts/redundancy on record, locus, genome, exact-RT and pair units | raw-record view vs independently built canonical views | the units intentionally collapse different duplicate classes |
+| `C3` | per-block occupancy, boundary uncertainty and failure state per RT family | published conventions + held-out structural/reference anchors | convention and structure are different instruments |
+| `C4` | motif/domain occupancy and geometry on non-redundant RTs | independent structures and family-matched controls | motif sequence and geometry can fail independently |
+| `C5` | ncRNA distance/orientation/CDS separation/overlap/multiplicity per locus | retron-labelled vs appropriate non-retron/context controls | comparator is not defined by the same ncRNA prior |
+| `C6` | paired-vs-mismatched association under progressively stronger relatedness controls | random, within-clade, within-genus, phylogenetically matched, taxonomy-only | each preserves a different amount of shared ancestry |
+| `C7` | per-tool agreement/disagreement classes on declared loci | independently provenanced routes where available | different program names do not imply independent evidence |
+| `C8` | replicated diversity/rarefaction/distribution on corrected sampling units | raw vs redundancy/database-composition-corrected sampling | sequencing effort and biology contribute differently |
+| `C9` | localisation plus boundary error/coverage on known-boundary controls | independently known positive controls | finding an object and delimiting its edges are distinct measurements |
+
+Every rate names its population in words and carries a denominator that can be independently checked.
+
+## Project dependencies
+
+Stage 1 establishes canonical objects and retained flags. RT0–RT7/domain work consumes the non-redundant RT view; neighbourhood work the locus/context view; diversity/taxonomy the redundancy+metadata views; annotation-disagreement the per-tool calls/missingness; co-evolution the RT–ncRNA pair view plus later relatedness and delimitation controls. Future launchers are written just-in-time from this contract plus landed evidence; `/home/borg/RETRON_STAGES/` is a planning archive, not a predeclared workflow.
 
 ## Kill criteria for the project
 
-`[OPERATOR — the one field nothing in RETRON_STAGES contains. What result would make you
-abandon this line entirely, as opposed to abandoning one stage?]`
-
-## Operator decisions outstanding
-
-From `01_database_characterization.md` §5 and §6 — scientific calls, not agent calls:
-
-1. **Which uniqueness key carries the phrase "unique system" in the paper.** All three get
-   measured; one gets the name.
-2. **Metagenomic versus isolate records — together or separately?** Currently undeclared,
-   and it moves every diversity and saturation number downstream.
-3. **What becomes the frozen reference dataset.** Recommendation on record: freeze the
-   locus-level table *with flags*, and freeze views by declared query rather than by
-   copying rows, so a downstream stage cites a view definition plus a table hash.
-
-## Known-wrong — read before reusing anything
-
-⚠️ Absence is loud; wrongness is quiet. From `01_database_characterization.md` §4, each
-already paid for once:
-
-- ⛔ **Coordinates are contig-based.** `intergenic_regions[].start/end` and `rt_gene.start/end`
-  are contig coordinates; `genomic_context.full_sequence` is a window. **1 in 6 records has
-  `start == 1`**, where both frames coincide and every arithmetic check passes. Generalising
-  from one such record once excluded **97.2%** of regions. Verify by **RT back-translation**.
-- ⛔ **"Complete" means ORF-complete.** **69.2%** of previously-admitted proteins do not fill
-  the RT window; three live "complete" rules reach the same ~70% on sets agreeing at only
-  **Jaccard 0.728**. Equal rates are not equal sets.
-- ⛔ **Never glob a cache directory that also holds an aggregate file.** One such glob swept a
-  merged table into a "non-retron" denominator: n = 924,847 against a real 423,274, and
-  99.65% of the "non-retron" hits were retrons.
-- ⚠️ **`full_lineage` is two schemas** keyed by `taxonomy_system` — gtdb 7-field, ncbi 3-field
-  with no phylum. Count per system, never pooled.
-- ⚠️ **`system_subtypes` is two tools on one locus** (capital-initial = DefenseFinder,
-  lowercase = PADLOC), agreeing on **44.6%**. Carry it; never `groupby` it.
-- ⚠️ **Pooling hides the distribution.** `PQG[GA]` read **41.78% pooled vs 0.373%
-  median-family** — a 112× gap.
-- ⚠️ **`rt_hash` is not a sequence hash** and no `rt_hash → locus` link exists. Compute `sha256`.
-- ⚠️ **`VOID_DO_NOT_CITE.md` has not been consulted.** `00_INDEX` says to check it before
-  quoting any figure. Locate it before any prior number is cited.
+- If the canonical raw corpus cannot be identity-pinned and reconstructed with auditable sequence, coordinate and source provenance, no corpus-wide biological claim is promoted; narrow to reference/method work until repaired.
+- If a headline effect cannot be separated from the detector/model convention that defined its population, do not promote it as biology.
+- A null/refuting result kills the scientific line it addresses, not the whole project. Negative results land when the instrument has demonstrated power to detect the corresponding positive.
 
 ## Key decisions
 
 | date | decision | why | supersedes |
 |---|---|---|---|
-| 2026-09-14 | The 15 `RESEARCH-retron-db` bundles are `RE-DERIVE`, not `FROZEN` | `coverage.tsv`: 0.0% denominator coverage. Reproducible, not citable. | — |
-| 2026-09-14 | `research-wClaude-PART1_v2` is `DO-NOT-USE` | stopped mid-flight; nothing landed | — |
+| 2026-09-14 | ARIS owns lifecycle/artifacts/loops/reviewer routing; governance constrains data safety, evidence, provenance, reporting and compute. | avoid a second workflow engine | governance-orchestrated lifecycle |
+| 2026-09-14 | `/home/borg/RETRON_STAGES/` and earlier projects are idea/evidence sources, not authorities. | prior work is useful but carries known provenance/definition problems | treating stage notes as frozen truth |
+| 2026-09-14 | Keep parallel analytical units/views instead of one universal “unique system.” | locus, exact RT and RT–ncRNA pair answer different questions | one deduplicated master subset |
+| 2026-09-14 | Stage 1 follows REUSE → VERIFY → GAP ANALYSIS → COMPUTE ONLY GAPS. | extensive prior work exists | recompute-everything Stage 1 |
+| 2026-09-14 | Keep large/canonical data in place; register path+hash and copy only small load-bearing references when useful. | avoid duplicate research trees | indiscriminate copying |
+
+## Known-wrong
+
+⚠️ Absence is loud; wrongness is quiet — a stale artefact reads as ready and nothing
+prompts a check. Each of these was paid for once; the numbers are what make them stick.
+
+- ⛔ **Coordinates are contig-based.** `intergenic_regions[].start/end` and `rt_gene.start/end`
+  are contig coordinates; `genomic_context.full_sequence` is a window and `actual_window.start`
+  the offset. **1 in 6 records has `start == 1`**, where both frames coincide and every
+  arithmetic check passes anyway. Generalising from one such record once excluded **97.2%** of
+  regions. Verify by **RT back-translation**, never by inspection.
+- ⛔ **"Complete" means ORF-complete.** **69.2%** of previously-admitted proteins do not fill
+  the RT window, and three live "complete" rules reach the same ~70% on sets agreeing at only
+  **Jaccard 0.728**. Equal rates are not equal sets.
+- ⛔ **Never glob a cache directory that also holds an aggregate file.** One such glob swept a
+  merged table into a "non-retron" denominator: **n = 924,847 against a real 423,274**, and
+  **99.65%** of the resulting "non-retron" hits were retrons.
+- ⚠️ **Do not pool `system_subtypes`** — it is two tools on one locus (capital-initial =
+  DefenseFinder, lowercase = PADLOC), agreeing on **44.6%**. Carry it; never `groupby` it.
+- ⚠️ **`taxonomy.full_lineage` is two schemas** keyed by `taxonomy_system` — gtdb 7-field,
+  ncbi 3-field with **no phylum**. Count per system, never pooled.
+- ⚠️ **Pooling hides the distribution.** A pooled cross-group rate is the largest group's rate:
+  `PQG[GA]` read **41.78% pooled vs 0.373% median-family**, a **112×** gap.
+- ⚠️ **Inherited `rt_hash` is not a sequence hash** and no `rt_hash → locus` link exists.
+  Compute `sha256` over the amino-acid sequence in this project.
+- ⚠️ **`intergenic_regions[].has_ncrna` can be true while `ncrnas` is empty.** Any geometry
+  built on `has_ncrna` must reconcile against `ncrnas` per record.
+- ⚠️ `V_verify/cache/v1b_collapsed_RTxncRNA.parquet` is **not** the canonical pair set.
+- ⚠️ Historical diversity/identity figures that do not reproduce their saved tables are not
+  evidence here.
+- ⚠️ Local InterProScan/Pfam is a **stub** — Pfam-A holds 3–4 profiles, TIGRFAM 1. A clean run
+  against it is `DATA_INADEQUATE`, **not a negative**. Full Pfam-A 37.0 (21,979 models) is
+  registered on Ibex.
+- ⛔ **`VOID_DO_NOT_CITE.md` has not been consulted.** `RETRON_STAGES/00_INDEX.md` says to check
+  it before quoting any prior figure. **Locate it before any prior number is cited.**
