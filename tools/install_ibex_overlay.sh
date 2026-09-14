@@ -79,18 +79,28 @@ BLOCK
 if [ "$CHECK_ONLY" = 1 ]; then
   [ -f "$DEST" ] || { echo "✗ overlay not installed at $DEST"; exit 1; }
   grep -q "SITE OVERRIDE — Ibex routing" "$DEST" || { echo "✗ $DEST exists but carries no override block"; exit 1; }
-  # the body must still match upstream, or upstream moved and we are stale
-  if ! diff -q <(sed -n '/Everything below this line is upstream ARIS, verbatim./,$p' "$DEST" | tail -n +3) \
-               <(tail -n +2 "$SRC" | sed -n '/^---$/,$p' | tail -n +2) >/dev/null 2>&1; then
-    echo "⚠ overlay body differs from upstream at the pinned sha — re-derive it."; exit 1
+  # Compare the upstream hash recorded at derivation time against upstream now. Hashes,
+  # not extracted regions: the previous form guessed at file layout with sed and fired on
+  # an overlay it had just derived correctly, which is worse than no check.
+  RECORDED="$(sed -n 's/^<!-- derived-from-sha256: \([0-9a-f]*\).*/\1/p' "$DEST" | head -1)"
+  CURRENT="$(sha256sum "$SRC" | cut -d' ' -f1)"
+  if [ -z "$RECORDED" ]; then
+    echo "⚠ $DEST carries no derived-from marker — derived by an older version. Re-derive."; exit 1
   fi
-  echo "OK: Ibex routing override installed and matches upstream ${WANT_SHA:0:12}"
+  if [ "$RECORDED" != "$CURRENT" ]; then
+    echo "⚠ upstream experiment-bridge has changed since this overlay was derived."
+    echo "  recorded ${RECORDED:0:12}, current ${CURRENT:0:12} — re-derive it."; exit 1
+  fi
+  echo "OK: Ibex routing override installed, derived from upstream ${CURRENT:0:12} at ARIS ${WANT_SHA:0:12}"
   exit 0
 fi
 
 mkdir -p "$(dirname "$DEST")"
+SRC_SHA="$(sha256sum "$SRC" | cut -d' ' -f1)"
 {
   awk '/^---$/{n++; print; if(n==2) exit; next} {print}' "$SRC"   # upstream frontmatter
+  printf '\n<!-- derived-from-sha256: %s  (ARIS %s, %s) -->\n' \
+         "$SRC_SHA" "${WANT_SHA:0:12}" "$(date -u +%Y-%m-%d)"
   printf '%s\n' "$PRECEDENCE"
   awk 'BEGIN{n=0} /^---$/{n++; if(n<=2) next} n>=2{print}' "$SRC" # upstream body, verbatim
 } > "$DEST"
