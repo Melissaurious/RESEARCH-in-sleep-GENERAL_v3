@@ -1,0 +1,6 @@
+# generated snapshots
+compute/ibex_resources.md
+
+__pycache__/
+*.pyc
+.DS_Store

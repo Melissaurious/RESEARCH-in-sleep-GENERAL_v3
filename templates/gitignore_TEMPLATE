@@ -1,0 +1,35 @@
+# Copy to <project-root>/.gitignore BEFORE the first commit.
+#
+# The workshop never ships; the shipped record is committed by hand, at the end.
+# Without this file, one `git add -A` stages 40 GB of embeddings.
+# → specs/PROMOTION_STANDARDS.md
+
+# ── the workshop: everything, always ──────────────────────────────────────────
+ARIS_OUTPUT/
+
+# ── source data and original scripts: read-only, and not ours to version ──────
+DATA/
+MELISSA_DATA/
+MELISSA_SCRIPTS/
+papers/
+
+# ── results/ IS committed — but deliberately, by Melissa, at the end.
+#    Nothing here excludes it. These guards only stop the accidents:
+results/**/cache/
+results/**/*.log
+results/**/slurm-*.out
+results/**/__pycache__/
+results/**/*.npy
+results/**/*.npz
+results/**/*.h5
+results/**/*.pt
+results/**/*.pkl
+results/**/*.fasta
+results/**/*.jsonl
+
+# ── environment / editor ──────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.env
+.DS_Store

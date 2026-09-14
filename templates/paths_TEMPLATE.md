@@ -1,4 +1,8 @@
-# Canonical Paths — Retron DB Project
+# Canonical Paths — Retron DB Project  *(worked EXAMPLE, not the source of truth)*
+
+> ⚠️ Path **names** are declared in `specs/ANCHORS.md`; per-project values live in that
+> project's own `CLAUDE.md`. This file is kept as a filled-in example of how a project
+> records its read-only inputs and tool locations — copy the shape, not the paths.
 
 ## Local (borg)
 | Name | Path |

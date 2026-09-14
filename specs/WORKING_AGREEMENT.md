@@ -9,7 +9,9 @@ _Global behavior spec. Loaded every session. Fold recurring retro lessons back i
 - **Avoid `sed -i`.** In-place rewrites are error-prone and hard to verify. Prefer
   explicit, reviewable edits.
 - **One script per task, ≤200 lines.** If a task needs more, split it by responsibility.
-  Projects may override this in their own CLAUDE.md.
+  Projects may override this in their own CLAUDE.md. Shared infrastructure under
+  `tools/` is exempt (≤400). _An earlier LAUNCHERS_README said ≤500; that was wrong and
+  is gone. 200 is the number._
 - **No function over 50 lines.** Type hints and a docstring on every public function.
 - **Run each script after writing it.** Don't hand back untested code.
 - **Smoke-test expensive scripts.** Every script touching real compute must accept
@@ -38,8 +40,50 @@ _Global behavior spec. Loaded every session. Fold recurring retro lessons back i
   and a clip flag that was structurally always false. When actual values diverge from
   the contract, the values win — and the correction gets folded back into the contract.
 
+## Verifying — six rules, each earned by a failure
+_Promoted from `retros/2026-08-25_ncrna_representation_probes.md`. Every one of these cost
+real work before it became a rule._
+
+- ⛔ **A FILENAME IS NOT A VERIFICATION**, and `ran: False` is not a pass. A name asserting
+  a property invites nothing — a document at least invites reading. **Ask what a passing
+  check covers, not only whether it passed.** Four of five delivered sets once rode on a
+  filename, guarded by a check that never ran and was read as fine.
+- ⭐ **To verify an artefact you did not build, choose an instrument that shares NO
+  derivation with it.** A re-derivation that disagrees is ambiguous between their defect
+  and your bug — and your incentives resolve that ambiguity the wrong way.
+- ⭐ **A defect charged to ANOTHER stage's artefact requires a control that could
+  EXONERATE it, run before the claim is written.** Without one, a defect report is a
+  hypothesis wearing a verdict's clothes. ⚠️ Finding defects in inherited work gets
+  rewarded, and that is exactly the condition under which a false positive becomes likely.
+- ⭐ **When a guard fires on a continuum, ask whether the STATISTIC is a correlate before
+  touching the cut.** A relative max over 1280×L values turned out to be a correlate of
+  length (r = +0.32); replacing the statistic, not moving the threshold, was the fix.
+  **And a range measured on a sample is not the population's range** — 200 smoke records
+  gave a band 8× too narrow.
+- ⭐ **When a check fails on a subset, the first hypothesis is that it is pointed at the
+  wrong input** — and the second is that a `.get()` default would have hidden it. Fourth
+  instance across two trees; it is now a diagnosis, not a caution.
+- ⭐ **Assert the identity, not the round number that resembles it**, and **read back what
+  you just wrote.** "Reconciles to `total_nt × 1280 × 2`" was off by a 128-byte `.npy`
+  header × 28,431 files. "A 57% excess" was 56.4%. Both figures were right; the
+  *statements* were not. Reading back also catches a partial writer that leaves a
+  syntactically valid file.
+- ⛔ **The vantage point does not exempt the vantage point.** A stage positioned to audit
+  others' artefacts is biased toward finding defects and least positioned to doubt its
+  own. Apply every rule above to your own output first.
+
 ## Workflow
-- **Plan first for non-trivial work.** Short numbered plan → approval → execute.
+- **Four phases, two gates.** Plan → **attack the plan** → execute → **attack the result**
+  → promote → retro. Pass 1 blocks execution; pass 2 blocks promotion to `results/`.
+  Full protocol and verdict vocabulary: `specs/ADVERSARIAL_REVIEW.md`. Never skip a gate
+  because the stage "looks simple" — simple stages are where unfalsifiable numbers hide.
+- **Work dirty in `ARIS_OUTPUT/`, ship clean to `results/`.** Dead ends and scratch belong
+  in the workshop and are never tidied away; the promoted copy must rerun from a fresh
+  checkout. Promotion is a COPY, never a move, and never runs before pass 2 clears:
+  `specs/PROMOTION_STANDARDS.md`.
+- **Respect the declared compute budget.** The launcher states an estimate and a hard
+  stop (default 2× ). At the stop, report — do not push through and do not silently
+  re-scope. Blowing a budget is information about the plan, not an obstacle to it.
 - **State assumptions inline** instead of stopping on every ambiguity. Ask only when a
   wrong guess would waste real work. Full protocol: master CLAUDE.md § When blocked.
 - **Choose the machine deliberately.** Before any job >10 min: check `nvidia-smi` and
@@ -86,5 +130,10 @@ ls <run_script>
 → `specs/REPORTING_STANDARDS.md` — figures, report structure, interpretation format.
 
 ## After each session
-Write `retros/YYYY-MM-DD_<stage>.md`: what worked, what Claude misunderstood, what to
-fix. A session without a retro is unfinished. Promote recurring lessons into this file.
+Write `retros/YYYY-MM-DD_<STAGE_ID>.md`: what worked, what Claude misunderstood, what
+surprised you, what to fix. **A session without a retro is unfinished.**
+
+⚠️ **And a rule named in a retro but not landed in a spec does not exist.** The
+2026-08-25 retro closed with six rules marked "to fold into `specs/`"; for weeks none of
+them were here. Folding them in is part of the retro, not a follow-up to it — open the
+PR against `$RSG` in the same session.
