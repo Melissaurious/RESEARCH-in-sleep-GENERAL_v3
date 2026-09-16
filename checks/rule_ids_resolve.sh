@@ -19,8 +19,12 @@ defined() {   # ids DEFINED by the agreements: **WA-x.y** or a leading "BS-n"
 }
 cited() {     # ids CITED anywhere, excluding retros (historical) and this check's own
               # selftest fixtures -- which it would otherwise read as real citations.
+              # RETRON_STAGES/ is imported historical prose carrying v6-era ids; its own README
+              # says it is "source material, not an authority" -- excluded like retros/. RETRON_STAGES/
+              # is imported historical prose carrying v6-era ids; its own README says it is
+              # "source material, not an authority" -- excluded on the same grounds as retros/.
   grep -rohE "$ID_RE" --include='*.md' --include='*.sh' --include='*.py' \
-       --exclude-dir=retros --exclude-dir=.git \
+       --exclude-dir=retros --exclude-dir=RETRON_STAGES --exclude-dir=.git \
        --exclude='rule_ids_resolve.sh' . 2>/dev/null \
     | grep -vE '^WA-Z\.' | sort -u
 }
@@ -34,7 +38,7 @@ run() {
       [ -n "$id" ] || continue
       printf '  %-10s cited in: %s\n' "$id" \
         "$(grep -rlE "\b$id\b" --include='*.md' --include='*.sh' --include='*.py' . \
-           | grep -v './retros/' | grep -v 'rule_ids_resolve' | tr '\n' ' ')"
+           | grep -v './retros/' | grep -v './RETRON_STAGES/' | grep -v 'rule_ids_resolve' | tr '\n' ' ')"
     done <<< "$missing"
     return 1
   fi

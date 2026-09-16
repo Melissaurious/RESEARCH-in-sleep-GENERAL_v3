@@ -227,7 +227,9 @@
         "glogin.ibex.kaust.edu.sa",
         "api.openai.com",
         "files.pythonhosted.org",
-        "pypi.org"
+        "pypi.org",
+        "generativelanguage.googleapis.com",
+        "aiplatform.googleapis.com"
       ]
     }
   },

@@ -46,6 +46,52 @@ codex exec --skip-git-repo-check -
 Reaching it needs `api.openai.com` in `sandbox.network.allow` — the scaffolded
 `settings.json` has it.
 
+### The roster — three families, assigned to different jobs
+
+⚠️ **More reviewers is not more signal.** Two reviewers reading the same artifact and
+answering the same questions mostly agree, cost two rounds, and teach you to skim both.
+What raises independence is **different eyes on different questions**, never a bigger panel.
+
+| job | reviewer | why that one |
+|---|---|---|
+| **plan audit**, before compute (`skills/plan-audit/`) | **Gemini** | the questions are about *design* — falsifiability, circularity, controls, whether a denominator is named. A long-context model can hold the launcher, the contract and the real schema probes at once. |
+| **result review**, before landing | **codex** `gpt-5.6-sol` | the questions are about *arithmetic and provenance* — does every number trace to a script, does the TSV reproduce the figure, is the identity exact. |
+| **gap analysis** (`REUSE → VERIFY → GAP ANALYSIS`) | **Gemini** | ⭐ the one job neither of the others can do: read the whole programme archive *and* every prior bundle README at once, and say what is genuinely missing rather than what is merely unfamiliar. |
+| the work itself | **Opus 5** | — |
+
+⭐ **Neither reviewer ever sees the other's verdict, or its own earlier one.** That is what
+keeps the two gates independent rather than sequential.
+
+⛔ Do **not** run both reviewers on the same gate hoping for a tie-break. A disagreement
+between two models is not a measurement, and resolving it costs a round of attention you
+owe the science instead. If a gate needs a tie-break, the launcher's question was unclear.
+
+### Wiring Gemini
+
+Probe it **by execution** before trusting it (`EVIDENCE_STANDARDS` §2) — the same bar codex
+had to clear. Find which access you have and record the exact working invocation here:
+
+```bash
+gemini --version            # the Google CLI, if installed
+which gemini llm            # or an `llm` plugin
+echo $GEMINI_API_KEY        # or API access
+printf 'Reply with exactly: OK' | <your invocation>
+```
+
+Then record it, as codex is recorded:
+
+```bash
+export RSG_PLAN_REVIEW_CMD="<the verified invocation>"
+export RSG_PLAN_REVIEWER_FAMILY=google
+```
+
+Network: needs `generativelanguage.googleapis.com` (API) or `aiplatform.googleapis.com`
+(Vertex) in `sandbox.network.allow`.
+
+⚠️ **Until the probe returns real output on a real packet, Gemini is `ABSENT`, not
+configured** — and an absent reviewer is never a cleared gate. Paste what the probe returns
+and the invocation gets recorded here rather than guessed.
+
 
 ## ARIS
 
