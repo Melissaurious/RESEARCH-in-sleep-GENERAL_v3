@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # WA-C.1 — one agent process writes to one checkout at a time.
 #
-#   acquire (SessionStart hook):  bash agreements/checks/no_concurrent_writer.sh
-#   release (SessionEnd  hook):   bash agreements/checks/no_concurrent_writer.sh --release
-#   validate me:                  SELFTEST=1 bash agreements/checks/no_concurrent_writer.sh
+#   acquire (SessionStart hook):  bash general/checks/no_concurrent_writer.sh
+#   release (SessionEnd  hook):   bash general/checks/no_concurrent_writer.sh --release
+#   validate me:                  SELFTEST=1 bash general/checks/no_concurrent_writer.sh
 #
 # Two properties this must have and the previous version did not:
 #
@@ -78,7 +78,7 @@ acquire() {
     if [ -z "$pid" ] || [ -z "$host" ]; then
       echo "BLOCKED (WA-C.1): $LOCK exists but is not parseable (no pid=/host= line)." >&2
       echo "  An unreadable lock is treated as HELD, never as absent. Inspect it, then:" >&2
-      echo "  bash agreements/checks/no_concurrent_writer.sh --release" >&2
+      echo "  bash general/checks/no_concurrent_writer.sh --release" >&2
       return 1
     fi
     if [ "$host" != "$HOST" ]; then
@@ -101,7 +101,7 @@ acquire() {
     fi
     if [ -z "$(find "$LOCK" -mmin +"$STALE_MIN" 2>/dev/null)" ]; then
       echo "BLOCKED (WA-C.1): lock from pid $pid ($who) is not alive but is recent (<${STALE_MIN}m)." >&2
-      echo "  Confirm no session is running, then: bash agreements/checks/no_concurrent_writer.sh --release" >&2
+      echo "  Confirm no session is running, then: bash general/checks/no_concurrent_writer.sh --release" >&2
       return 1
     fi
     echo "WARN: stale lock from pid $pid ($who, $when) older than ${STALE_MIN}m; taking over." >&2
