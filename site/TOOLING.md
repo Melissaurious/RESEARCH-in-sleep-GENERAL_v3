@@ -68,30 +68,52 @@ owe the science instead. If a gate needs a tie-break, the launcher's question wa
 
 ### Wiring Gemini
 
-Probe it **by execution** before trusting it (`EVIDENCE_STANDARDS` §2) — the same bar codex
-had to clear. Find which access you have and record the exact working invocation here:
+Gemini is reached **through MCP, not through a shell command** — the project declares an
+`llm-chat` MCP server and ARIS calls `/auto-review-loop-llm` instead of `/auto-review-loop`:
 
-```bash
-gemini --version            # the Google CLI, if installed
-which gemini llm            # or an `llm` plugin
-echo $GEMINI_API_KEY        # or API access
-printf 'Reply with exactly: OK' | <your invocation>
+```
+## Reviewer Config
+- MCP: llm-chat  (Gemini)
+- Use /auto-review-loop-llm, not /auto-review-loop
 ```
 
-Then record it, as codex is recorded:
+That is a different transport from codex's, so the `RSG_PLAN_REVIEW_CMD` slot does not
+apply to it — there is no command to export. What has to be true instead:
 
-```bash
-export RSG_PLAN_REVIEW_CMD="<the verified invocation>"
-export RSG_PLAN_REVIEWER_FAMILY=google
-```
+1. `llm-chat` is listed in the project's `.mcp.json`, and the session actually connects to
+   it. An MCP server that fails to start is silent in a way a missing binary is not.
+2. `generativelanguage.googleapis.com` (API) or `aiplatform.googleapis.com` (Vertex) is in
+   `sandbox.network.allow` — already added to `templates/settings.json`.
+3. The launcher's Reviewer Config block names the model actually served, not the one
+   configured. Record what the probe returns.
 
-Network: needs `generativelanguage.googleapis.com` (API) or `aiplatform.googleapis.com`
-(Vertex) in `sandbox.network.allow`.
+Probe it **by execution** before trusting it (`EVIDENCE_STANDARDS` §2, WA-K.2) — the same
+bar codex had to clear. Send one real review packet, not a ping, and read the answer: a
+reviewer that returns fluent agreement to a plan with a known hole in it has failed the
+probe even though it replied.
 
-⚠️ **Until the probe returns real output on a real packet, Gemini is `ABSENT`, not
-configured** — and an absent reviewer is never a cleared gate. Paste what the probe returns
-and the invocation gets recorded here rather than guessed.
+⚠️ **Until that returns a real verdict on a real packet, Gemini is `ABSENT`, not
+configured** — and an absent reviewer is never a cleared gate.
 
+#### Two things to settle before it counts as the plan auditor
+
+**The model tier.** `gemini-2.5-flash` is the cheap tier. For the result review that would
+be merely slower; for the **plan audit** it is a real risk, because a weak adversary does
+not return "I found nothing" — it returns a fluent clearance, and a cleared gate is exactly
+what this layer spends its rules trying not to hand out for free. The plan audit asks
+whether a design is circular, whether a denominator is named, whether a control could come
+back positive for the wrong reason. Use the **pro / thinking tier** for that job and leave
+flash to bulk work where a wrong answer is visible immediately. If only flash is available,
+say so in the launcher and treat its verdict as advisory, not as `plan-audit` cleared.
+
+**Whether `/auto-review-loop-llm` still goes through the deterministic gate.** ARIS's
+`/auto-review-loop` makes the transition with ARIS's own `review_gate.py`: positive requires
+`score >= 6` **and** verdict in `{ready, almost}`. Check that the `-llm` variant gates the
+same way rather than reading a verdict out of free text. If it does not, it is transport
+with no gate, and routing the plan audit through it **weakens an ARIS review requirement —
+WA-A.5 forbids that**. In that case keep `/auto-review-loop-llm` for the advisory read and
+have `plan-audit` apply the threshold itself: score >= 6, positive verdict, and no finding
+marked BLOCKING.
 
 ## ARIS
 
