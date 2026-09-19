@@ -42,6 +42,7 @@ speaks SLURM.
 | `tools/check_launcher.py` | refuses a launcher that cannot run unattended |
 | `tools/pin_aris.sh` | pins the ARIS revision a project runs against — `ARIS.lock` |
 | `tools/install_ibex_overlay.sh` | **derives** a same-name override of `experiment-bridge` from the pinned ARIS so Ibex routing is binding, not descriptive. Fails closed if ARIS has drifted off the pin. |
+| `tools/bootstrap_worktree.sh` | makes a **git worktree** able to run Ibex. `git worktree add` copies tracked files only, so `general/` arrives empty and every skill symlink dangles silently. Run once per new worktree. |
 | `tools/bundle.sh` · `index.sh` · `dispatch.py` · `cache.py` | bundle assembly, rollup, machine choice, caching |
 
 ## Checks
